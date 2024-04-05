@@ -4,19 +4,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.fashionPeople.fashionGuide.data.Screen
 
 @Composable
 fun MainScreen() {
+    val screenList = listOf(Screen.Home,Screen.Favorites,Screen.Search)
     val navController = rememberNavController()
     Scaffold(
-        bottomBar = { BottomBar(navController) }
+        bottomBar = { BottomNavigationBar(navController,screenList) }
     ) { innerPaddingModifier ->
-// Inner padding from the bottom bar
+
         NavHost(
             navController,
             startDestination = Screen.Home.route,
@@ -41,27 +44,44 @@ fun MainScreen() {
 }
 
 @Composable
-fun BottomBar(navController: NavHostController) {
+fun BottomNavigationBar(navController: NavController, items: List<Screen>) {
     NavigationBar {
-        val currentDestination = navController.currentDestination?.route
-        NavigationBarItem(
-            icon = { Icon(Screen.Home.icon, contentDescription = null) },
-            label = { Text("Home") },
-            selected = currentDestination == Screen.Home.route,
-            onClick = { navController.navigate(Screen.Home.route) }
-        )
-        NavigationBarItem(
-            icon = { Icon(Screen.Favorites.icon, contentDescription = null) },
-            label = { Text("Favorites") },
-            selected = currentDestination == Screen.Favorites.route,
-            onClick = { navController.navigate(Screen.Favorites.route) }
-        )
-        NavigationBarItem(
-            icon = { Icon(Screen.Search.icon, contentDescription = null) },
-            label = { Text("Search") },
-            selected = currentDestination == Screen.Search.route,
-            onClick = { navController.navigate(Screen.Search.route) }
-        )
+
+        val currentBackStackEntry = navController.currentBackStackEntryAsState()
+
+        val currentDestination = currentBackStackEntry.value?.destination
+
+        items.forEach { item ->
+
+            val selected = currentDestination?.hierarchy?.any { it.route == item.route } == true
+            NavigationBarItem(
+                icon = { Icon(imageVector = item.icon, contentDescription = item.route) },
+                label = { Text(item.route) },
+                selected = selected,
+                onClick = {
+
+                    if (!selected) {
+                        navController.navigate(item.route) {
+
+                            launchSingleTop = true
+
+                            restoreState = true
+
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                        }
+                    }
+                },
+
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            )
+        }
     }
 }
 
