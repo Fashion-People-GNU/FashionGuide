@@ -17,7 +17,7 @@ import com.fashionPeople.fashionGuide.data.Screen
 
 @Composable
 fun MainScreen() {
-    val screenList = listOf(Screen.Home,Screen.Favorites,Screen.Settings)
+    val screenList = listOf(Screen.Home,Screen.Closet,Screen.Settings)
     val navController = rememberNavController()
     Scaffold(
         bottomBar = { BottomNavigationBar(navController,screenList) },
@@ -40,7 +40,7 @@ fun MainScreen() {
                 HomeScreen()
 
             }
-            composable(Screen.Favorites.route) {
+            composable(Screen.Closet.route) {
 
                 FavoritesScreen()
             }
