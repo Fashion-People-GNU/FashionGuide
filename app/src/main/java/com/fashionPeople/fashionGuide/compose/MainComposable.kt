@@ -1,6 +1,9 @@
 package com.fashionPeople.fashionGuide.compose
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -14,10 +17,17 @@ import com.fashionPeople.fashionGuide.data.Screen
 
 @Composable
 fun MainScreen() {
-    val screenList = listOf(Screen.Home,Screen.Favorites,Screen.Search)
+    val screenList = listOf(Screen.Home,Screen.Favorites,Screen.Settings)
     val navController = rememberNavController()
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController,screenList) }
+        bottomBar = { BottomNavigationBar(navController,screenList) },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { /*TODO*/ }) {
+                Icon(Icons.Filled.Search, contentDescription = "Search")
+            }
+        },
+        floatingActionButtonPosition = FabPosition.Center
+
     ) { innerPaddingModifier ->
 
         NavHost(
@@ -34,18 +44,19 @@ fun MainScreen() {
 
                 FavoritesScreen()
             }
-            composable(Screen.Search.route) {
+            composable(Screen.Settings.route) {
 
-                SearchScreen()
+                SettingsScreen()
 
             }
         }
+
     }
 }
 
 @Composable
 fun BottomNavigationBar(navController: NavController, items: List<Screen>) {
-    NavigationBar {
+    NavigationBar{
 
         val currentBackStackEntry = navController.currentBackStackEntryAsState()
 
@@ -96,8 +107,8 @@ fun FavoritesScreen(){
 }
 
 @Composable
-fun SearchScreen(){
-    Text(text = "Search")
+fun SettingsScreen(){
+    Text(text = "Settings")
 }
 
 
