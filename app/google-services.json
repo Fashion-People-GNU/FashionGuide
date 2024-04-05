@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "513763739759",
+    "project_id": "todays-clothes-1100f",
+    "storage_bucket": "todays-clothes-1100f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:513763739759:android:51a43504d39411cc12259a",
+        "android_client_info": {
+          "package_name": "com.fashionPeople.fashionGuide"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtjrR1Aw9hve35c10nPReJnSNycQgTr_4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
