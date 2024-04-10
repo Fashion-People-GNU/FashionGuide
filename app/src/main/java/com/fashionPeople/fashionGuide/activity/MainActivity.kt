@@ -1,4 +1,4 @@
-package com.fashionPeople.fashionGuide
+package com.fashionPeople.fashionGuide.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -26,13 +26,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    FashionGuideTheme {
-
     }
 }
