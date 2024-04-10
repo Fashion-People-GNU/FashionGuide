@@ -90,6 +90,10 @@ dependencies {
     implementation("com.google.firebase:firebase-auth:22.3.1") // Firebase Auth
     implementation("com.google.android.gms:play-services-auth:21.0.0")// Google Sign-In
 
+    implementation("androidx.credentials:credentials:1.3.0-alpha02")
+    implementation("androidx.credentials:credentials:1.2.2")
+    implementation("androidx.credentials:credentials-play-services-auth:1.2.2")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
 
 
 }
