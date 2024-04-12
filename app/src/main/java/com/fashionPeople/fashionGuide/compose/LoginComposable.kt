@@ -1,6 +1,7 @@
 package com.fashionPeople.fashionGuide.compose
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -71,9 +72,10 @@ fun LoginScreen(context: Context) {
                         val digest = md.digest(bytes)
                         val hashedNonce = digest.fold("") { str, it -> str + "%02x".format(it) }
 
+                        Log.d("test",R.string.server_client_id.toString())
                         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
                             .setFilterByAuthorizedAccounts(false)
-                            .setServerClientId(R.string.server_client_id.toString())
+                            .setServerClientId("46367136175-faq39nrqar4b8m07cvij010v79i0u77p.apps.googleusercontent.com")
                             .setNonce(hashedNonce)
                             .build()
 
