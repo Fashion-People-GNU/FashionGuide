@@ -1,6 +1,8 @@
 package com.fashionPeople.fashionGuide.compose
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -28,6 +30,7 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
 import com.fashionPeople.fashionGuide.R
+import com.fashionPeople.fashionGuide.activity.MainActivity
 import com.fashionPeople.fashionGuide.ui.theme.Typography
 import com.fashionPeople.fashionGuide.ui.theme.WhiteGray
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
@@ -39,7 +42,7 @@ import java.util.UUID
 
 
 @Composable
-fun LoginScreen(context: Context) {
+fun LoginScreen(context: Context,activity: Activity) {
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -97,6 +100,7 @@ fun LoginScreen(context: Context) {
                             val googleIdToken = googleIdTokenCredential.idToken
 
                             Toast.makeText(context, "Sign In!", Toast.LENGTH_SHORT).show()
+                            activity.startActivity(Intent(activity,MainActivity::class.java))
                         }
                     } catch (e: GetCredentialException) {
                         Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
