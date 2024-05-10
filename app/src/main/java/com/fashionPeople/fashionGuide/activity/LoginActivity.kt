@@ -25,7 +25,7 @@ class LoginActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    LoginScreen(LocalContext.current)
+                    LoginScreen(LocalContext.current, this)
                 }
             }
         }

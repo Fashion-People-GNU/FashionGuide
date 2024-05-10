@@ -87,13 +87,16 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
     implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-auth:22.3.1") // Firebase Auth
-    implementation("com.google.android.gms:play-services-auth:21.0.0")// Google Sign-In
+    implementation("com.google.firebase:firebase-auth:23.0.0") // Firebase Auth
+    implementation("com.google.android.gms:play-services-auth:21.1.1")// Google Sign-In
 
-    implementation("androidx.credentials:credentials:1.3.0-alpha02")
+    implementation("androidx.credentials:credentials:1.3.0-alpha03")
     implementation("androidx.credentials:credentials:1.2.2")
     implementation("androidx.credentials:credentials-play-services-auth:1.2.2")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
 
+    implementation("com.google.firebase:firebase-auth-ktx:23.0.0")
+    implementation("com.google.firebase:firebase-firestore-ktx:25.0.0")
 
+    implementation("com.google.firebase:firebase-auth-ktx")
 }
