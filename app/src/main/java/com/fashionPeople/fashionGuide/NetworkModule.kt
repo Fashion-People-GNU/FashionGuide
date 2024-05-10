@@ -15,11 +15,12 @@ object NetworkModule {
     @Provides
     fun provideRetrofit(): Retrofit =
         Retrofit.Builder()
-            .baseUrl("https://your.api.url/")
+            .baseUrl("http://203.232.193.151:5000/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
     @Provides
     fun provideClothingApi(retrofit: Retrofit): ClothingApi =
         retrofit.create(ClothingApi::class.java)
+
 }

@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
+import com.fashionPeople.fashionGuide.AppManager
 import com.fashionPeople.fashionGuide.R
 import com.fashionPeople.fashionGuide.activity.MainActivity
 import com.fashionPeople.fashionGuide.ui.theme.Typography

@@ -4,6 +4,7 @@ plugins {
     id("com.google.gms.google-services")
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -78,6 +79,9 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.tv:tv-material:1.0.0-alpha10")
+    implementation("androidx.compose.material:material-icons-core:1.6.7")
+    implementation("androidx.compose.material:material-icons-extended:1.6.7")
+    implementation("io.coil-kt:coil-compose:2.1.0")
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.activity:activity-ktx:1.9.0")

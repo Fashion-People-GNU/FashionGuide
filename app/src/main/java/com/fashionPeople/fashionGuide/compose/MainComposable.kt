@@ -1,9 +1,18 @@
 package com.fashionPeople.fashionGuide.compose
 
-import android.graphics.drawable.Drawable
+import android.app.Activity
+import android.content.ContentValues
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.MediaStore
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,28 +28,40 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -52,21 +73,31 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.fashionPeople.fashionGuide.R
+import com.fashionPeople.fashionGuide.activity.AddClothingActivity
+import com.fashionPeople.fashionGuide.activity.DetailedClothingActivity
+import com.fashionPeople.fashionGuide.data.Clothing
 import com.fashionPeople.fashionGuide.data.Screen
 import com.fashionPeople.fashionGuide.ui.theme.Typography
 import com.fashionPeople.fashionGuide.ui.theme.WhiteGray
+import com.fashionPeople.fashionGuide.viewmodel.MainViewModel
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(viewModel: MainViewModel) {
     val screenList = listOf(Screen.Home,Screen.Closet,Screen.Settings)
     val navController = rememberNavController()
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    val closetBottomSheet = rememberModalBottomSheetState()
+    val isSheetOpen = viewModel.bottomSheetOpen
     Scaffold(
         bottomBar = { BottomNavigationBar(navController,screenList) },
         floatingActionButton = {
             if (currentRoute == Screen.Closet.route) {
                 FloatingActionButton(
-                    onClick = { /* TODO */ }
+                    onClick = {
+                        isSheetOpen.value = true
+                    }
                 ) {
                     Icon(Icons.Filled.Add, contentDescription = "Add")
                 }
@@ -94,8 +125,7 @@ fun MainScreen() {
 
             }
             composable(Screen.Closet.route) {
-
-                ClosetScreen()
+                ClosetScreen(viewModel.clothingLiveData.value!!)
             }
             composable(Screen.Settings.route) {
 
@@ -103,8 +133,99 @@ fun MainScreen() {
 
             }
         }
+        if (isSheetOpen.value) {
+            ImagePickerBottomSheet(closetBottomSheet,isSheetOpen)
+        }
 
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ImagePickerBottomSheet(state: SheetState, isSheetOpen: MutableState<Boolean>) {
+    val context = LocalContext.current
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { isSuccess ->
+        if (isSuccess) {
+            Log.d("test","성공")
+            imageUri?.let {
+                context.startActivity(AddClothingActivity.newIntent(context, it))
+            }
+        }
+    }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            context.startActivity(AddClothingActivity.newIntent(context, it))
+        }
+    }
+    ModalBottomSheet(
+        sheetState = state,
+        onDismissRequest = {
+            isSheetOpen.value = false}
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            TextButton(
+                onClick = {
+                    // 카메라 앱 실행
+                    val photoUri = createImageUri(context)
+                    imageUri = photoUri
+                    if(photoUri!=null){
+                        cameraLauncher.launch(photoUri)
+                    }else{
+                        Toast.makeText(context, "Failed to create a URI for the image.", Toast.LENGTH_LONG).show()
+                    }
+
+
+                },
+                modifier = Modifier.weight(1f)
+            ) {
+                Column {
+                    Icon(
+                        Icons.Filled.CameraAlt,
+                        modifier = Modifier.width(50.dp).height(50.dp),
+                        contentDescription = "Camera"
+                    )
+                    Text("카메라", style = Typography.bodyLarge)
+                }
+            }
+
+            TextButton(
+                onClick = {
+                    // 갤러리 앱 실행
+                    galleryLauncher.launch("image/*")
+                },
+                modifier = Modifier.weight(1f)
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        Icons.Filled.DateRange,
+                        modifier = Modifier.width(50.dp).height(50.dp),
+                        contentDescription = "Gallery"
+                    )
+                    Text("갤러리", style = Typography.bodyLarge)
+                }
+            }
+        }
+    }
+}
+private fun createImageUri(context: Context): Uri? {
+    val contentValues = ContentValues().apply {
+        put(MediaStore.Images.Media.TITLE, "New Photo")
+        put(MediaStore.Images.Media.DESCRIPTION, "From the Camera")
+    }
+    return context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
 }
 
 @Composable
@@ -225,15 +346,16 @@ fun HomeScreen(){
 }
 
 @Composable
-fun ClosetScreen(){
+fun ClosetScreen(clothes: List<Clothing>){
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(4.dp)
     ) {
         WeatherBox()
-        GridLayout()
+        GridLayout(clothes)
     }
+
 }
 
 @Composable
@@ -311,34 +433,40 @@ private fun WeatherBox() {
 }
 
 @Composable
-fun GridLayout() {
-    val items = (1..20).toList()
-
+fun GridLayout(clothes: List<Clothing>) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.Center,
         verticalArrangement = Arrangement.Center
     ) {
-        items(items.size) { index ->
-            GridItem(index = index)
+        items(clothes.size) { index ->
+            GridItem(clothes[index])
         }
     }
 }
 
 @Composable
-fun GridItem(index: Int) {
+fun GridItem(clothing: Clothing) {
+    val context = LocalContext.current
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                val intent = Intent(context, DetailedClothingActivity::class.java).apply {
+                    putExtra("clothing", clothing)
+                }
+                context.startActivity(intent)
+            }
     ) {
         Image(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
             painter = painterResource(id = R.drawable.test_item),
-            contentDescription = "test_image"
+            contentDescription = "clothing_image"
         )
         Text(
-            text = "옷 $index",
+            text = clothing.name,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()

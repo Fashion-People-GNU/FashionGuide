@@ -76,9 +76,15 @@ fun DetailedClothingScreen(activity: Activity, viewModel: DetailedClothingViewMo
             ) },
     ) { innerPaddingModifier ->
 
-        Box(modifier = Modifier.padding(innerPaddingModifier)){
-
-                Image(painter = painterResource(id = viewModel.clothing.value!!.image), contentDescription = "test")
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(innerPaddingModifier),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            Image(
+                painter = painterResource(id = viewModel.clothing.value!!.image), contentDescription = "image")
+            Text(
+                text = viewModel.clothing.value!!.name)
         }
 
     }

@@ -13,7 +13,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.fashionPeople.fashionGuide.compose.LoginScreen
 import com.fashionPeople.fashionGuide.compose.MainScreen
 import com.fashionPeople.fashionGuide.ui.theme.FashionGuideTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

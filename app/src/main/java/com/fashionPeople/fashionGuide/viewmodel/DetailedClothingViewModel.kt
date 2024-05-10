@@ -17,7 +17,7 @@ class DetailedClothingViewModel @Inject constructor(
     val clothing :MutableLiveData<Clothing>
         get() = _clothing
 
-    fun setCloth(){
-        _clothing.value = Clothing(id =1,"테스트 옷", R.drawable.test_item)
+    fun setCloth(clothing: Clothing){
+        _clothing.value = clothing
     }
 }
