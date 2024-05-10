@@ -1,5 +1,6 @@
 package com.fashionPeople.fashionGuide
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.fashionPeople.fashionGuide.data.Clothing
@@ -17,13 +18,16 @@ class ClothingRepository @Inject constructor(private val api: ClothingApi) {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     Resource.success(null)
+                    Log.d("test","success")
                 } else {
                     Resource.error("Failed to add clothing", null)
+                    Log.d("test","fail")
                 }
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
                 Resource.error("Network error", null)
+                Log.d("test","fail2")
             }
         })
 

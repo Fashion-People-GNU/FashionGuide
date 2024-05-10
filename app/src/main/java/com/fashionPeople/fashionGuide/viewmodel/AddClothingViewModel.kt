@@ -2,6 +2,7 @@ package com.fashionPeople.fashionGuide.viewmodel
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.fashionPeople.fashionGuide.AppManager
@@ -67,7 +68,7 @@ class AddClothingViewModel @Inject constructor(
         }
 
         val imageRequestBody = outputFile.asRequestBody("image/*".toMediaTypeOrNull())
-
+        Log.d("test",imageRequestBody.toString())
         return MultipartBody.Part.createFormData("image", outputFile.name, imageRequestBody)
     }
 }

@@ -2,12 +2,14 @@ package com.fashionPeople.fashionGuide.utils
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
 import com.fashionPeople.fashionGuide.AppManager
+import com.fashionPeople.fashionGuide.activity.MainActivity
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
@@ -93,14 +95,14 @@ class LoginUtils(coroutineScope: CoroutineScope, activity: Activity, localContex
                 if (task.isSuccessful) {
                     Log.d("firebaseLogin", "signInWithCredential:success")
                     val user = mAuth.currentUser
-                    saveUserToFirestore(user)
+                    saveUserToFirestore(user,activity)
                 } else {
                     Log.w("firebaseLogin", "signInWithCredential:failure", task.exception)
                 }
             }
     }
 
-    private fun saveUserToFirestore(user: FirebaseUser?) {
+    private fun saveUserToFirestore(user: FirebaseUser?,activity: Activity) {
         user?.let {
             val userId = it.uid
             val email = it.email
@@ -120,6 +122,9 @@ class LoginUtils(coroutineScope: CoroutineScope, activity: Activity, localContex
                     Toast.makeText(context, "실패", Toast.LENGTH_SHORT).show()
                     Log.e("LoginUtils", "saveUserToFirestore", e)
                 }
+            val intent = Intent(activity,MainActivity::class.java)
+            activity.finish()
+            activity.startActivity(intent)
         }
     }
 }

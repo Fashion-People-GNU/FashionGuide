@@ -110,7 +110,10 @@ fun AddClothingScreen(viewModel: AddClothingViewModel) {
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(0.dp),
-                onClick = { viewModel.addClothing(imagePart) }
+                onClick = {
+                    viewModel.setClothingName(text.text)
+                    viewModel.addClothing(imagePart)
+                }
             ) {
                 Text(text = "저장")
             }
