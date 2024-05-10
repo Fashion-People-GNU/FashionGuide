@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">FashionGuide</string>
     <string name="server_client_id">46367136175-faq39nrqar4b8m07cvij010v79i0u77p.apps.googleusercontent.com</string>
+    <string name="android_client_id">46367136175-su2audqb5helte63nsli480aek0rmrp9.apps.googleusercontent.com</string>
 </resources>
