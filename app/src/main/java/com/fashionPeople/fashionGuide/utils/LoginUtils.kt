@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
+import com.fashionPeople.fashionGuide.AppManager
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
@@ -109,7 +110,7 @@ class LoginUtils(coroutineScope: CoroutineScope, activity: Activity, localContex
                 "email" to email,
                 "displayName" to displayName
             )
-
+            AppManager.saveIdToken(userId)
             db.collection("users").document(userId)
                 .set(userData)
                 .addOnSuccessListener {
