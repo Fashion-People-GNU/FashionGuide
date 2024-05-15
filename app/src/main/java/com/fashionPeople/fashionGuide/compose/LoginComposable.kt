@@ -2,6 +2,7 @@ package com.fashionPeople.fashionGuide.compose
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -29,6 +30,8 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
 import com.fashionPeople.fashionGuide.R
+import com.fashionPeople.fashionGuide.activity.MainActivity
+import com.fashionPeople.fashionGuide.data.AccountAssistant
 import com.fashionPeople.fashionGuide.ui.theme.Typography
 import com.fashionPeople.fashionGuide.ui.theme.WhiteGray
 import com.fashionPeople.fashionGuide.utils.LoginUtils
@@ -44,6 +47,11 @@ import java.util.UUID
 fun LoginScreen(context: Context, activity:Activity) {
 
     val coroutineScope = rememberCoroutineScope()
+    val loginUtils = LoginUtils(coroutineScope, activity, context)
+    if (activity.getSharedPreferences(AccountAssistant.PREFS_NAME, Activity.MODE_PRIVATE).getBoolean(
+            AccountAssistant.KEY_IS_LOGIN, false)) {
+        loginUtils.autoLogin()
+    }
 
     Scaffold(
         modifier = Modifier
@@ -63,8 +71,7 @@ fun LoginScreen(context: Context, activity:Activity) {
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                          //구글 로그인 함수 넣으면 돼
-                    val loginUtils = LoginUtils(coroutineScope, activity, context)
+                    //구글 로그인 함수 넣으면 돼
                     loginUtils.googleLogin()
                 },
                 colors= ButtonDefaults.buttonColors(

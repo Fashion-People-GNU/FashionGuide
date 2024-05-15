@@ -2,19 +2,21 @@ package com.fashionPeople.fashionGuide.utils
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.util.Log
-import android.widget.Toast
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
 import com.fashionPeople.fashionGuide.AppManager
+import com.fashionPeople.fashionGuide.activity.MainActivity
+import com.fashionPeople.fashionGuide.data.AccountAssistant
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.auth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
@@ -75,7 +77,6 @@ class LoginUtils(coroutineScope: CoroutineScope, activity: Activity, localContex
 
                 firebaseLogin(googleIdToken)
 
-                //Toast.makeText(context, "Sign In!", Toast.LENGTH_SHORT).show()
             }
         } catch (e: GetCredentialException) {
             Log.e("LoginUtils", "GetCredentialException", e)
@@ -110,16 +111,44 @@ class LoginUtils(coroutineScope: CoroutineScope, activity: Activity, localContex
                 "email" to email,
                 "displayName" to displayName
             )
+
             AppManager.saveIdToken(userId)
             db.collection("users").document(userId)
                 .set(userData)
                 .addOnSuccessListener {
                     Log.d("LoginUtils", "saveUserToFirestore")
+                    AccountAssistant.setUID(context ,userId)
+                    val preferences = activity.getSharedPreferences(AccountAssistant.PREFS_NAME, Context.MODE_PRIVATE)
+                    preferences.edit().apply {
+                        putBoolean(AccountAssistant.KEY_IS_LOGIN, true)
+                        apply()
+                    }
+                    val i = Intent(context, MainActivity::class.java)
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(i)
                 }
                 .addOnFailureListener { e ->
-                    Toast.makeText(context, "실패", Toast.LENGTH_SHORT).show()
                     Log.e("LoginUtils", "saveUserToFirestore", e)
                 }
         }
     }
+
+    fun autoLogin() {
+        val preferences = activity.getSharedPreferences(AccountAssistant.PREFS_NAME, Context.MODE_PRIVATE)
+        if (preferences.getBoolean(AccountAssistant.KEY_IS_LOGIN, false)) {
+            val i = Intent(context, MainActivity::class.java)
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(i)
+        }
+    }
+
+    private fun logout() {
+        AccountAssistant.clearPreferences(context)
+        val preferences = activity.getSharedPreferences(AccountAssistant.PREFS_NAME, Context.MODE_PRIVATE)
+        preferences.edit().apply {
+            putBoolean(AccountAssistant.KEY_IS_LOGIN, false)
+            apply()
+        }
+    }
+
 }
