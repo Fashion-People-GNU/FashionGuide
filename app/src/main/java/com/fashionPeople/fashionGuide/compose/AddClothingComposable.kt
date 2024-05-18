@@ -2,6 +2,7 @@ package com.fashionPeople.fashionGuide.compose
 
 import android.app.Activity
 import android.graphics.drawable.Drawable
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -100,7 +101,10 @@ fun AddClothingScreen(viewModel: AddClothingViewModel) {
                     .fillMaxWidth()
                     .background(color = Color(0xFFF6F6F6)),
                 value = text,
-                onValueChange = { text = it },
+                onValueChange = {
+                    text = it
+                    viewModel.setClothingName(text.text)
+                                },
                 label = {
                     Text("옷 이름")
                 }
@@ -110,7 +114,8 @@ fun AddClothingScreen(viewModel: AddClothingViewModel) {
                 modifier = Modifier
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(0.dp),
-                onClick = { viewModel.addClothing(imagePart) }
+                onClick = { viewModel.addClothing(imagePart)
+                Log.d("test", viewModel.clothing.value!!.name)}
             ) {
                 Text(text = "저장")
             }

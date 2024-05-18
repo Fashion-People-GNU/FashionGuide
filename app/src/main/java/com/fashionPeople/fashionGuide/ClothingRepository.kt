@@ -12,23 +12,25 @@ import retrofit2.Response
 import javax.inject.Inject
 
 class ClothingRepository @Inject constructor(private val api: ClothingApi) {
-    fun addClothing(uid: String, imageName: String, image: MultipartBody.Part) {
-
+    fun addClothing(uid: String, imageName: String, image: MultipartBody.Part): LiveData<Resource<Any?>> {
+        val result = MutableLiveData<Resource<Any?>>()
+        result.postValue(Resource.loading(null))  // 초기 로딩 상태 설정
         api.addClothing(uid, imageName, image).enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
-                    Resource.success(null)
+                    result.postValue(Resource.success(null))
                     Log.d("test", "성공?")
                 } else {
-                    Resource.error("Failed to add clothing", null)
+                    result.postValue(Resource.error("Failed to add clothing", null))  // 실패 상태 포스트
+
                 }
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
-                Resource.error("Network error", null)
+                result.postValue(Resource.error("Network error", null))
             }
         })
-
+        return result
     }
 
     fun deleteClothing(id: Int): LiveData<Resource<Unit>> {

@@ -31,6 +31,7 @@ import com.fashionPeople.fashionGuide.ui.theme.FashionGuideTheme
 import com.fashionPeople.fashionGuide.viewmodel.AddClothingViewModel
 import com.fashionPeople.fashionGuide.viewmodel.DetailedClothingViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.migration.CustomInjection.inject
 
 @AndroidEntryPoint
 class AddClothingActivity : ComponentActivity() {
@@ -45,7 +46,7 @@ class AddClothingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val imageUri = intent.getStringExtra("image_uri")?.let { Uri.parse(it) }
-
+        observeViewModel()
         setContent {
             FashionGuideTheme {
                 Surface(
@@ -55,11 +56,18 @@ class AddClothingActivity : ComponentActivity() {
                     viewModel.init()
                     imageUri?.let {
                         viewModel.setClothingUri(imageUri)
-                        Log.d("test",viewModel.clothingUri.value.toString())
                         AddClothingScreen(viewModel = viewModel)
                     }
 
                 }
+            }
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.closeActivityEvent.observe(this) { event ->
+            event.getContentIfNotHandled()?.let {
+                finish() // 액티비티 종료
             }
         }
     }
