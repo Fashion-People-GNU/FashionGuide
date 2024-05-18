@@ -3,14 +3,12 @@ package com.fashionPeople.fashionGuide.utils
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
-import com.fashionPeople.fashionGuide.AppManager
 import com.fashionPeople.fashionGuide.activity.MainActivity
-import com.fashionPeople.fashionGuide.data.AccountAssistant
+import com.fashionPeople.fashionGuide.AccountAssistant
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
@@ -112,12 +110,11 @@ class LoginUtils(coroutineScope: CoroutineScope, activity: Activity, localContex
                 "displayName" to displayName
             )
 
-            AppManager.saveIdToken(userId)
             db.collection("users").document(userId)
                 .set(userData)
                 .addOnSuccessListener {
                     Log.d("LoginUtils", "saveUserToFirestore")
-                    AccountAssistant.setUID(context ,userId)
+                    AccountAssistant.setUID(userId)
                     val preferences = activity.getSharedPreferences(AccountAssistant.PREFS_NAME, Context.MODE_PRIVATE)
                     preferences.edit().apply {
                         putBoolean(AccountAssistant.KEY_IS_LOGIN, true)
@@ -143,7 +140,7 @@ class LoginUtils(coroutineScope: CoroutineScope, activity: Activity, localContex
     }
 
     private fun logout() {
-        AccountAssistant.clearPreferences(context)
+        AccountAssistant.clearPreferences()
         val preferences = activity.getSharedPreferences(AccountAssistant.PREFS_NAME, Context.MODE_PRIVATE)
         preferences.edit().apply {
             putBoolean(AccountAssistant.KEY_IS_LOGIN, false)

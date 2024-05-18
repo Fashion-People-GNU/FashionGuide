@@ -2,16 +2,16 @@ package com.fashionPeople.fashionGuide.viewmodel
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.fashionPeople.fashionGuide.AppManager
+import com.fashionPeople.fashionGuide.AccountAssistant
 import com.fashionPeople.fashionGuide.ClothingRepository
 import com.fashionPeople.fashionGuide.data.Clothing
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -48,12 +48,11 @@ class AddClothingViewModel @Inject constructor(
     @OptIn(DelicateCoroutinesApi::class)
     fun addClothing(imagePart: MultipartBody.Part) {
         // addClothing 함수 호출
-        val uid = AppManager.getIdToken()
+        val uid = AccountAssistant.getUID()
         val imageName = clothing.value!!.name
         GlobalScope.launch(Dispatchers.IO) {
             repository.addClothing(uid!!, imageName, imagePart)
         }
-
     }
 
     fun createImagePartFromUri(context: Context, uri: Uri): MultipartBody.Part {

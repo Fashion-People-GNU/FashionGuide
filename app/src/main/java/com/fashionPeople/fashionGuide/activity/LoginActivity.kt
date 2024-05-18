@@ -6,14 +6,10 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.fashionPeople.fashionGuide.compose.LoginScreen
-import com.fashionPeople.fashionGuide.data.AccountAssistant
 import com.fashionPeople.fashionGuide.ui.theme.FashionGuideTheme
-import com.fashionPeople.fashionGuide.utils.LoginUtils
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
