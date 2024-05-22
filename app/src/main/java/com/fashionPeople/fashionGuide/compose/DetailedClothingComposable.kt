@@ -87,6 +87,15 @@ fun DetailedClothingScreen(activity: Activity, viewModel: DetailedClothingViewMo
                 text = viewModel.clothing.value!!.name)
         }
 
+
+
+
+
+
+
+
+
+
     }
 }
 

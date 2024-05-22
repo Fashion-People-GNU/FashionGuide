@@ -27,6 +27,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     viewModel.setCloth()
+                    viewModel.getClothingList()
                     MainScreen(viewModel)
                 }
             }

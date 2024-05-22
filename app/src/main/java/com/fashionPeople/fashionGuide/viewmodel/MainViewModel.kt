@@ -24,6 +24,14 @@ class MainViewModel @Inject constructor(
     val bottomSheetOpen: MutableState<Boolean>
         get() = _bottomSheetOpen
 
+    fun getClothingList(){
+        repository.getClothingList().observeForever { resource ->
+            if (resource.status == Status.SUCCESS) {
+                clothingLiveData.value = resource.data
+            }
+
+        }
+    }
     fun setBottomSheet(isBottomSheet: Boolean){
         _bottomSheetOpen.value = isBottomSheet
     }

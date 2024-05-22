@@ -90,6 +90,7 @@ fun MainScreen(viewModel: MainViewModel) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     val closetBottomSheet = rememberModalBottomSheetState()
     val isSheetOpen = viewModel.bottomSheetOpen
+
     Scaffold(
         bottomBar = { BottomNavigationBar(navController,screenList) },
         floatingActionButton = {
@@ -433,16 +434,32 @@ private fun WeatherBox() {
 }
 
 @Composable
-fun GridLayout(clothes: List<Clothing>) {
+fun GridLayout(clothingList: List<Clothing>) {
+    //옷장페이지에서 옷을 불러오는 코드
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        horizontalArrangement = Arrangement.Center,
-        verticalArrangement = Arrangement.Center
-    ) {
-        items(clothes.size) { index ->
-            GridItem(clothes[index])
+        content = {
+            items(clothingList.size) { index ->
+                val clothing = clothingList[index]
+                Box(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(WhiteGray)
+                        .height(100.dp)
+                        .width(100.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = clothing.image),
+                        contentDescription = "image",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(4.dp))
+                    )
+                }
+            }
         }
-    }
+    )
 }
 
 @Composable
