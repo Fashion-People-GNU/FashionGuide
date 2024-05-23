@@ -3,6 +3,7 @@ package com.fashionPeople.fashionGuide.compose
 import android.app.Activity
 import android.graphics.drawable.Drawable
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -39,12 +41,15 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -77,10 +82,22 @@ import java.io.File
 fun AddClothingScreen(viewModel: AddClothingViewModel) {
     val context = LocalContext.current
     val imagePart = remember { viewModel.createImagePartFromUri(context, viewModel.clothingUri.value!!)}
+    viewModel.errorMessage.observe(context as AddClothingActivity) { event ->
+        event.getContentIfNotHandled()?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
         topBar = { TopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.background,
+                titleContentColor = MaterialTheme.colorScheme.onBackground,
+                navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+            ),
+
             title = { Text("내 옷 추가") },
             navigationIcon = {
                 IconButton(onClick = { (context as? AddClothingActivity)?.finish() }) {
@@ -111,9 +128,16 @@ fun AddClothingScreen(viewModel: AddClothingViewModel) {
                     Text("옷 이름")
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
+                        maxLines = 1,
                         textStyle = Typography.bodyMedium,
                         modifier = Modifier
                             .fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                            focusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                        ),
                         value = text,
                         onValueChange = {
                             text = it
@@ -122,16 +146,24 @@ fun AddClothingScreen(viewModel: AddClothingViewModel) {
 
                 }
             }
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter),
-                shape = RoundedCornerShape(0.dp),
-                onClick = { viewModel.addClothing(imagePart)
-                    Log.d("test", viewModel.clothing.value!!.name)}
-            ) {
-                Text(text = "저장")
+            if(viewModel.isLoading.value){
+                Log.d("test", "loading")
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }else{
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter),
+                    shape = RoundedCornerShape(0.dp),
+                    onClick = {
+                        viewModel.addClothing(imagePart)
+                        Log.d("test", viewModel.isLoading.value.toString())}
+                ) {
+                    Text(text = "저장", style = Typography.bodyLarge)
+                    //로딩화면
+                }
             }
+
         }
 
     }

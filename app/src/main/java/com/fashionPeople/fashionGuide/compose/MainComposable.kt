@@ -13,11 +13,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -60,7 +62,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -122,7 +126,7 @@ fun MainScreen(viewModel: MainViewModel) {
         ) {
             composable(Screen.Home.route) {
 
-                HomeScreen()
+                HomeScreen(viewModel)
 
             }
             composable(Screen.Closet.route) {
@@ -190,13 +194,21 @@ fun ImagePickerBottomSheet(state: SheetState, isSheetOpen: MutableState<Boolean>
                 },
                 modifier = Modifier.weight(1f)
             ) {
-                Column {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Icon(
                         Icons.Filled.CameraAlt,
-                        modifier = Modifier.width(50.dp).height(50.dp),
-                        contentDescription = "Camera"
+                        modifier = Modifier
+                            .width(50.dp)
+                            .height(50.dp),
+                        contentDescription = "Camera",
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
-                    Text("카메라", style = Typography.bodyLarge)
+                    Text(
+                        text="카메라",
+                        style = Typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onBackground)
                 }
             }
 
@@ -212,10 +224,17 @@ fun ImagePickerBottomSheet(state: SheetState, isSheetOpen: MutableState<Boolean>
                 ) {
                     Icon(
                         Icons.Filled.DateRange,
-                        modifier = Modifier.width(50.dp).height(50.dp),
+                        modifier = Modifier
+                            .width(50.dp)
+                            .height(50.dp),
+                        tint = MaterialTheme.colorScheme.onBackground,
                         contentDescription = "Gallery"
                     )
-                    Text("갤러리", style = Typography.bodyLarge)
+                    Text(
+                        text="갤러리",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = Typography.bodyLarge,
+  )
                 }
             }
         }
@@ -231,86 +250,106 @@ private fun createImageUri(context: Context): Uri? {
 
 @Composable
 fun BottomNavigationBar(navController: NavController, items: List<Screen>) {
-    NavigationBar{
+    Box(
+        modifier = Modifier
+            .graphicsLayer {  }
+            .shadow(
+                elevation = 16.dp,
+                shape = MaterialTheme.shapes.medium,
+                clip = false,
+                ambientColor = if (isSystemInDarkTheme()) Color.White else Color.Gray,
+                spotColor = if (isSystemInDarkTheme()) Color.White else Color.Gray)
+    ){
+        NavigationBar(
+            modifier = Modifier
+                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
+            tonalElevation = 0.dp,
+            containerColor = MaterialTheme.colorScheme.background
+        ){
 
-        val currentBackStackEntry = navController.currentBackStackEntryAsState()
+            val currentBackStackEntry = navController.currentBackStackEntryAsState()
 
-        val currentDestination = currentBackStackEntry.value?.destination
+            val currentDestination = currentBackStackEntry.value?.destination
 
-        items.forEach { item ->
+            items.forEach { item ->
 
-            val selected = currentDestination?.hierarchy?.any { it.route == item.route } == true
-            NavigationBarItem(
-                icon = { Icon(imageVector = item.icon, contentDescription = item.route) },
-                label = { Text(item.route) },
-                selected = selected,
-                onClick = {
+                val selected = currentDestination?.hierarchy?.any { it.route == item.route } == true
+                NavigationBarItem(
+                    icon = { Icon(imageVector = item.icon, contentDescription = item.route) },
+                    label = { Text(item.route) },
+                    selected = selected,
+                    onClick = {
 
-                    if (!selected) {
-                        navController.navigate(item.route) {
+                        if (!selected) {
+                            navController.navigate(item.route) {
 
-                            launchSingleTop = true
+                                launchSingleTop = true
 
-                            restoreState = true
+                                restoreState = true
 
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
                             }
                         }
-                    }
-                },
-
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.primary,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.onBackground,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurface,
+                        selectedTextColor = MaterialTheme.colorScheme.onBackground,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurface,
+                        indicatorColor = MaterialTheme.colorScheme.background,
+                    )
                 )
-            )
+            }
         }
     }
+
 }
 
 @Composable
-fun CustomTabs() {
+fun CustomTabs(viewModel: MainViewModel) {
     var selectedIndex by remember { mutableIntStateOf(0) }
 
     val list = listOf("전체 추천", "부분 추천")
 
-    TabRow(selectedTabIndex = selectedIndex,
-        containerColor = Color.DarkGray,
-        contentColor = Color.DarkGray,
+    TabRow(
+        selectedTabIndex = selectedIndex,
         modifier = Modifier
             .padding(vertical = 4.dp, horizontal = 8.dp)
             .clip(RoundedCornerShape(50))
+            .background(MaterialTheme.colorScheme.background)
             .padding(1.dp),
-        indicator = {
-            Box {}
-        }
+        indicator = { Box {} },
+        containerColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground
     ) {
         list.forEachIndexed { index, text ->
             val selected = selectedIndex == index
             Tab(
-                modifier = if (selected) Modifier
+                modifier = Modifier
                     .clip(RoundedCornerShape(50))
                     .background(
-                        Color.White
-                    )
-                else Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(
-                        Color.DarkGray
+                        if (selected) MaterialTheme.colorScheme.onBackground
+                        else MaterialTheme.colorScheme.background
                     ),
                 selected = selected,
-                onClick = { selectedIndex = index },
-                text = { Text(text = text, color = Color.Black) }
+                onClick = {
+                    selectedIndex = index
+                    viewModel.isTabScreen.value = index },
+                text = {
+                    Text(
+                        text = text,
+                        color = if (selected) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.onBackground
+                    )
+                }
             )
         }
     }
 }
 
 @Composable
-fun HomeScreen(){
+fun HomeScreen(viewModel: MainViewModel){
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -328,22 +367,50 @@ fun HomeScreen(){
                 text = "오늘의 옷 추천")
         }
 
-        CustomTabs()
+        CustomTabs(viewModel)
         WeatherBox()
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            fontSize = 16.sp,
-            textAlign = TextAlign.Center,
-            text =
-            "여러 요소를 고려하여 상하의를 동시에 추천하는 방식")
-        Image(
-            modifier = Modifier
-                .padding(16.dp),
-            alignment = Alignment.Center,
-            painter = painterResource(id = R.drawable.content_image),
-            contentDescription = "content")
+
+        if (viewModel.isTabScreen.value == 0) {
+            EntireRecommendation()
+        } else {
+            PartialRecommendation()
+        }
+
 
     }
+}
+
+@Composable
+fun EntireRecommendation(){
+    Text(
+        modifier = Modifier.fillMaxWidth(),
+        fontSize = 16.sp,
+        textAlign = TextAlign.Center,
+        text = "상하의를 동시에 추천하는 방식")
+    Image(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        alignment = Alignment.Center,
+        painter = painterResource(id = R.drawable.content_image),
+        contentDescription = "content")
+}
+
+@Composable
+fun PartialRecommendation(){
+    Text(
+        modifier = Modifier.fillMaxWidth(),
+        fontSize = 16.sp,
+        textAlign = TextAlign.Center,
+        text = "상 하의중 하나를 추천하는 방식")
+    Image(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .padding(16.dp),
+        alignment = Alignment.Center,
+        painter = painterResource(id = R.drawable.test_item),
+        contentDescription = "content")
 }
 
 @Composable
@@ -351,8 +418,20 @@ fun ClosetScreen(clothes: List<Clothing>){
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(4.dp)
+            .padding(8.dp)
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+
+            ) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                text = "옷장")
+        }
+
         WeatherBox()
         GridLayout(clothes)
     }
@@ -384,7 +463,7 @@ private fun WeatherBox() {
             .fillMaxWidth()
             .padding(8.dp)
             .clip(RoundedCornerShape(4.dp))
-            .background(WhiteGray)
+            .background(MaterialTheme.colorScheme.surface)
 
     ) {
         Row(
@@ -395,12 +474,10 @@ private fun WeatherBox() {
             Text(
                 text = "금 ",
                 fontSize = 20.sp,
-                color = Color.Black
             )
             Text(
                 text = "4월 19일",
                 fontSize = 20.sp,
-                color = Color.LightGray
             )
         }
         Row(
@@ -410,19 +487,15 @@ private fun WeatherBox() {
         ) {
             Text(
                 text = "24",
-                color = Color.Black
             )
             Text(
                 text = "/",
-                color = Color.Black
             )
             Text(
                 text = "13",
-                color = Color.Black
             )
             Text(
                 text = "°C",
-                color = Color.Black
             )
             Image(
                 modifier = Modifier.padding(4.dp),
@@ -450,9 +523,10 @@ fun GridLayout(clothingList: List<Clothing>) {
                         .height(100.dp)
                         .width(100.dp)
                         .clickable {
-                            val intent = Intent(context, DetailedClothingActivity::class.java).apply {
-                                putExtra("clothing", clothingList[index])
-                            }
+                            val intent =
+                                Intent(context, DetailedClothingActivity::class.java).apply {
+                                    putExtra("clothing", clothingList[index])
+                                }
                             context.startActivity(intent)
                         }
                 ) {
@@ -502,12 +576,22 @@ fun TestGridItem(clothing: Clothing) {
 
 @Composable
 fun SettingsScreen(){
-    Column {
-        Text(
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
-            text = "앱 설정")
+
+            ) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                text = "설정")
+        }
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()

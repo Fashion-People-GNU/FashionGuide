@@ -3,6 +3,8 @@ package com.fashionPeople.fashionGuide.viewmodel
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -31,25 +33,30 @@ class AddClothingViewModel @Inject constructor(
 ): ViewModel() {
     private val _clothing = MutableLiveData<Clothing>()
     private val _clothingUri = MutableLiveData<Uri>()
-
+    private val _isLoading = mutableStateOf(false)
     private val _closeActivityEvent = MutableLiveData<Event<Unit>>()
+    private val _errorMessage = MutableLiveData<Event<String>>()
+    val errorMessage: LiveData<Event<String>> get() = _errorMessage
     val closeActivityEvent: LiveData<Event<Unit>> = _closeActivityEvent
 
-    val clothing : MutableLiveData<Clothing>
+    val clothing : LiveData<Clothing>
         get() = _clothing
 
-    val clothingUri : MutableLiveData<Uri>
+    val clothingUri : LiveData<Uri>
         get() = _clothingUri
+
+    val isLoading : MutableState<Boolean>
+        get() = _isLoading
 
     fun init(){
         val initClothing = Clothing(0,"",0)
-        clothing.value = initClothing
+        _clothing.value = initClothing
     }
     fun setClothingName(name: String){
         clothing.value?.name = name
     }
     fun setClothingUri(uri: Uri){
-        clothingUri.value = uri
+        _clothingUri.value = uri
     }
 
     fun addClothing(imagePart: MultipartBody.Part) {
@@ -62,14 +69,17 @@ class AddClothingViewModel @Inject constructor(
                 when (resource.status) {
                     Status.SUCCESS -> {
                         _closeActivityEvent.postValue(Event(Unit))  // 성공시 액티비티 종료 이벤트
+                        _isLoading.value = false
                         Log.d("test","tt")
                     }
                     Status.ERROR -> {
                         // 에러 처리, 예를 들어 사용자에게 메시지 표시
+                        _errorMessage.postValue(Event(resource.message ?: "통신 오류"))  // 에러 발생 시 메시지 이벤트 발생
                         Log.d("AddClothingVM", "Error adding clothing: ${resource.message}")
+                        _isLoading.value = false
                     }
                     Status.LOADING -> {
-                        // 로딩 상태 처리, 필요시 UI 업데이트
+                        _isLoading.value = true
                     }
                 }
             }

@@ -27,7 +27,7 @@ class ClothingRepository @Inject constructor(private val api: ClothingApi) {
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
-                result.postValue(Resource.error("Network error", null))
+                result.postValue(Resource.error("통신 오류", null))
             }
         })
         return result
