@@ -2,6 +2,7 @@ package com.fashionPeople.fashionGuide.viewmodel
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.MutableLiveData
@@ -18,12 +19,28 @@ class MainViewModel @Inject constructor(
 ): ViewModel() {
     private val _clothingLiveData = MutableLiveData<List<Clothing>>()
     private val _bottomSheetOpen = mutableStateOf(false)
+    private val _isTabScreen = mutableIntStateOf(0)
     val clothingLiveData:MutableLiveData<List<Clothing>>
         get() = _clothingLiveData
 
     val bottomSheetOpen: MutableState<Boolean>
         get() = _bottomSheetOpen
 
+    val isTabScreen: MutableState<Int>
+        get() = _isTabScreen
+
+    fun setTabScreen(tab: Int){
+        _isTabScreen.intValue = tab
+    }
+
+    fun getClothingList(){
+        repository.getClothingList().observeForever { resource ->
+            if (resource.status == Status.SUCCESS) {
+                clothingLiveData.value = resource.data
+            }
+
+        }
+    }
     fun setBottomSheet(isBottomSheet: Boolean){
         _bottomSheetOpen.value = isBottomSheet
     }

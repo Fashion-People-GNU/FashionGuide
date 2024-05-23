@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -37,6 +39,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -65,8 +68,14 @@ import com.fashionPeople.fashionGuide.viewmodel.DetailedClothingViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailedClothingScreen(activity: Activity, viewModel: DetailedClothingViewModel) {
+
     Scaffold(
         topBar = { TopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.background,
+                titleContentColor = MaterialTheme.colorScheme.onBackground,
+                navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+            ),
             title = { Text("내 옷 상세") },
             navigationIcon = {
                 IconButton(onClick = { activity.finish() }) {
@@ -79,13 +88,41 @@ fun DetailedClothingScreen(activity: Activity, viewModel: DetailedClothingViewMo
         Column(modifier = Modifier
             .fillMaxWidth()
             .padding(innerPaddingModifier),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.Start
         ){
             Image(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f),
                 painter = painterResource(id = viewModel.clothing.value!!.image), contentDescription = "image")
-            Text(
-                text = viewModel.clothing.value!!.name)
+            Column(
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text(text = "옷 정보")
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("옷 이름: ", style = Typography.bodyMedium)
+                    Text(viewModel.clothing.value!!.name, style = Typography.bodyMedium)
+                }
+                Spacer(modifier = Modifier
+                    .height(8.dp))
+                Divider(color = Color.LightGray, thickness = 1.dp)
+
+            }
+
         }
+
+
+
+
+
+
+
+
+
 
     }
 }

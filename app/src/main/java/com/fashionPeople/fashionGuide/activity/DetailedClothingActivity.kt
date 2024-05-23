@@ -28,6 +28,7 @@ class DetailedClothingActivity : ComponentActivity() {
             val clothing = intent.getParcelableExtra("clothing",Clothing::class.java)
 
             // clothing이 null인 경우를 고려하여 안전하게 ViewModel에 설정
+
             if (clothing != null) {
                 viewModel.setCloth(clothing)
             } else {
