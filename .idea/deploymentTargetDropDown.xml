@@ -5,6 +5,22 @@
       <entry key="DetailedClothingActivity">
         <State />
       </entry>
+      <entry key="LoginActivity">
+        <State>
+          <runningDeviceTargetSelectedWithDropDown>
+            <Target>
+              <type value="RUNNING_DEVICE_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\cha_d\.android\avd\Pixel_4_API_34.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </runningDeviceTargetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-05-23T06:50:51.449752700Z" />
+        </State>
+      </entry>
       <entry key="MainActivity">
         <State />
       </entry>
