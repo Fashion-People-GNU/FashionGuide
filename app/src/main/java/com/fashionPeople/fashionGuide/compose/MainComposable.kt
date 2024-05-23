@@ -336,7 +336,7 @@ fun CustomTabs(viewModel: MainViewModel) {
                 selected = selected,
                 onClick = {
                     selectedIndex = index
-                    viewModel.isTabScreen.value = index },
+                    viewModel.setTabScreen(index) },
                 text = {
                     Text(
                         text = text,

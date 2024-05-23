@@ -32,6 +32,7 @@ class MainViewModel @Inject constructor(
     fun setTabScreen(tab: Int){
         _isTabScreen.intValue = tab
     }
+
     fun getClothingList(){
         repository.getClothingList().observeForever { resource ->
             if (resource.status == Status.SUCCESS) {

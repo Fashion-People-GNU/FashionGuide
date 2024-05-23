@@ -2,6 +2,7 @@ package com.fashionPeople.fashionGuide.compose
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,6 +39,7 @@ fun LoginScreen(context: Context, activity:Activity) {
     if (activity.getSharedPreferences(AccountAssistant.PREFS_NAME, Activity.MODE_PRIVATE).getBoolean(
             AccountAssistant.KEY_IS_LOGIN, false)) {
         loginUtils.autoLogin()
+        Log.d("LoginScreen", "autoLogin")
     }
 
     Scaffold(

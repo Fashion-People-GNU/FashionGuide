@@ -68,6 +68,7 @@ class AddClothingViewModel @Inject constructor(
             repository.addClothing(uid, clothingName, imagePart).observeForever { resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
+                        _errorMessage.postValue(Event(resource.message ?: "통신 성공"))
                         _closeActivityEvent.postValue(Event(Unit))  // 성공시 액티비티 종료 이벤트
                         _isLoading.value = false
                         Log.d("test","tt")
