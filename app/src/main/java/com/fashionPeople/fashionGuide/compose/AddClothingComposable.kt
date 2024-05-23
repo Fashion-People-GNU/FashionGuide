@@ -38,6 +38,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -49,6 +50,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 import androidx.compose.ui.graphics.Color
@@ -60,6 +62,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.fashionPeople.fashionGuide.ClothingApi
 import com.fashionPeople.fashionGuide.NetworkModule
 import com.fashionPeople.fashionGuide.activity.AddClothingActivity
+import com.fashionPeople.fashionGuide.ui.theme.Typography
 import com.fashionPeople.fashionGuide.viewmodel.AddClothingViewModel
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -75,6 +78,8 @@ fun AddClothingScreen(viewModel: AddClothingViewModel) {
     val context = LocalContext.current
     val imagePart = remember { viewModel.createImagePartFromUri(context, viewModel.clothingUri.value!!)}
     Scaffold(
+        modifier = Modifier
+            .fillMaxSize(),
         topBar = { TopAppBar(
             title = { Text("내 옷 추가") },
             navigationIcon = {
@@ -84,43 +89,62 @@ fun AddClothingScreen(viewModel: AddClothingViewModel) {
             }
         ) },
     ) { innerPaddingModifier ->
-        Column(modifier = Modifier.padding(innerPaddingModifier)){
-            val painter = rememberAsyncImagePainter(
-                model = viewModel.clothingUri.value
-            )
-            var text by remember { mutableStateOf(TextFieldValue()) } // 에딧 텍스트 값을 상태로 관리
-            Image(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f),
-                contentScale = ContentScale.Crop,
-                painter = painter, contentDescription = "image"
-            )
-            TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = Color(0xFFF6F6F6)),
-                value = text,
-                onValueChange = {
-                    text = it
-                    viewModel.setClothingName(text.text)
-                                },
-                label = {
+        Box {
+            Column(modifier = Modifier.padding(innerPaddingModifier)){
+                val painter = rememberAsyncImagePainter(
+                    model = viewModel.clothingUri.value
+                )
+                var text by remember { mutableStateOf(TextFieldValue()) } // 에딧 텍스트 값을 상태로 관리
+                Image(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f),
+                    contentScale = ContentScale.Crop,
+                    painter = painter, contentDescription = "image"
+                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp),
+                ) {
+
                     Text("옷 이름")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        textStyle = Typography.bodyMedium,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        value = text,
+                        onValueChange = {
+                            text = it
+                            viewModel.setClothingName(text.text)
+                        })
+
                 }
-            )
-            Spacer(modifier = Modifier.weight(1f)) // 나머지 공간을 채우는 Spacer
+            }
             Button(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter),
                 shape = RoundedCornerShape(0.dp),
                 onClick = { viewModel.addClothing(imagePart)
-                Log.d("test", viewModel.clothing.value!!.name)}
+                    Log.d("test", viewModel.clothing.value!!.name)}
             ) {
                 Text(text = "저장")
             }
         }
+
     }
+    //옷장에서 옷을 추가하는 화면
+    //이미지를 선택하고, 옷 이름을 입력하고, 저장 버튼을 누르면 옷장에 옷이 추가됨
+    //이미지는 uri로 받아옴
+    //이미지를 서버에 업로드하고, 옷 이름과 함께 저장
+    //저장 버튼을 누르면 옷장으로 이동
+    //뒤로가기 버튼을 누르면 이전 화면으로 이동
+    //이미지를 선택하면 이미지가 화면에 나타남
+    //옷 이름을 입력하면 옷 이름이 저장됨
+    //저장 버튼을 누르면 옷 이름과 이미지가 서버에 저장됨
+    //저장 버튼을 누르면 옷장으로 이동
 }
 
 

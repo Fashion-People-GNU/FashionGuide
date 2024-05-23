@@ -436,6 +436,7 @@ private fun WeatherBox() {
 @Composable
 fun GridLayout(clothingList: List<Clothing>) {
     //옷장페이지에서 옷을 불러오는 코드
+    val context = LocalContext.current
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         content = {
@@ -448,6 +449,12 @@ fun GridLayout(clothingList: List<Clothing>) {
                         .background(WhiteGray)
                         .height(100.dp)
                         .width(100.dp)
+                        .clickable {
+                            val intent = Intent(context, DetailedClothingActivity::class.java).apply {
+                                putExtra("clothing", clothingList[index])
+                            }
+                            context.startActivity(intent)
+                        }
                 ) {
                     Image(
                         painter = painterResource(id = clothing.image),
@@ -463,7 +470,7 @@ fun GridLayout(clothingList: List<Clothing>) {
 }
 
 @Composable
-fun GridItem(clothing: Clothing) {
+fun TestGridItem(clothing: Clothing) {
     val context = LocalContext.current
     Column(
         modifier = Modifier
