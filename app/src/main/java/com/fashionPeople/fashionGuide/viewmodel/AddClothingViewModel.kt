@@ -59,6 +59,7 @@ class AddClothingViewModel @Inject constructor(
         _clothingUri.value = uri
     }
 
+
     fun addClothing(imagePart: MultipartBody.Part) {
         viewModelScope.launch {
             val uid = AccountAssistant.getUID() ?: return@launch  // UID가 null이면 함수를 종료
@@ -89,7 +90,7 @@ class AddClothingViewModel @Inject constructor(
 
     fun createImagePartFromUri(context: Context, uri: Uri): MultipartBody.Part {
         val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
-        val outputFile = File(context.cacheDir, "image_file.jpg") // 이미지 파일의 저장 위치 설정
+        val outputFile = File(context.cacheDir, AccountAssistant.getUID().toString() + ".jpg") // 이미지 파일의 저장 위치 설정
 
         inputStream?.use { input ->
             FileOutputStream(outputFile).use { output ->
