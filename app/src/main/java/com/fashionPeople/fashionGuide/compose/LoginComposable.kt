@@ -3,6 +3,7 @@ package com.fashionPeople.fashionGuide.compose
 import android.app.Activity
 import android.content.Context
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,17 +43,24 @@ fun LoginScreen(context: Context, activity:Activity) {
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .padding(10.dp)
+            .padding(8.dp)
     ) { innerPaddingModifier ->
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPaddingModifier),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Text(text="Welcome")
             Text("패션가이드")
+            Spacer(modifier = Modifier.size(10.dp))
+            Image(
+                modifier = Modifier.fillMaxWidth(),
+                painter = painterResource(id = R.drawable.fashoin_guide),
+                contentDescription = "logo",
+            )
             Spacer(modifier = Modifier.size(10.dp))
             Button(
                 modifier = Modifier.fillMaxWidth(),
