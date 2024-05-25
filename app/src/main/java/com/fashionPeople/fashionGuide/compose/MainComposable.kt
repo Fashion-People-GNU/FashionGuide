@@ -76,6 +76,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.fashionPeople.fashionGuide.R
 import com.fashionPeople.fashionGuide.activity.AddClothingActivity
 import com.fashionPeople.fashionGuide.activity.DetailedClothingActivity
@@ -252,13 +253,14 @@ private fun createImageUri(context: Context): Uri? {
 fun BottomNavigationBar(navController: NavController, items: List<Screen>) {
     Box(
         modifier = Modifier
-            .graphicsLayer {  }
+            .graphicsLayer { }
             .shadow(
                 elevation = 16.dp,
                 shape = MaterialTheme.shapes.medium,
                 clip = false,
                 ambientColor = if (isSystemInDarkTheme()) Color.White else Color.Gray,
-                spotColor = if (isSystemInDarkTheme()) Color.White else Color.Gray)
+                spotColor = if (isSystemInDarkTheme()) Color.White else Color.Gray
+            )
     ){
         NavigationBar(
             modifier = Modifier
@@ -531,7 +533,7 @@ fun GridLayout(clothingList: List<Clothing>) {
                         }
                 ) {
                     Image(
-                        painter = painterResource(id = clothing.image),
+                        painter = rememberAsyncImagePainter(model = clothing.imageUrl),
                         contentDescription = "image",
                         modifier = Modifier
                             .fillMaxSize()
@@ -564,7 +566,7 @@ fun TestGridItem(clothing: Clothing) {
             contentDescription = "clothing_image"
         )
         Text(
-            text = clothing.name,
+            text = clothing.imageName,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()

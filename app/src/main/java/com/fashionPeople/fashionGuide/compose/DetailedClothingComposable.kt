@@ -59,6 +59,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.fashionPeople.fashionGuide.R
 import com.fashionPeople.fashionGuide.data.Screen
 import com.fashionPeople.fashionGuide.ui.theme.Typography
@@ -94,7 +95,7 @@ fun DetailedClothingScreen(activity: Activity, viewModel: DetailedClothingViewMo
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f),
-                painter = painterResource(id = viewModel.clothing.value!!.image), contentDescription = "image")
+                painter = rememberAsyncImagePainter(model = viewModel.clothing.value!!.imageUrl), contentDescription = "image")
             Column(
                 modifier = Modifier.padding(8.dp)
             ) {
@@ -105,7 +106,7 @@ fun DetailedClothingScreen(activity: Activity, viewModel: DetailedClothingViewMo
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text("옷 이름: ", style = Typography.bodyMedium)
-                    Text(viewModel.clothing.value!!.name, style = Typography.bodyMedium)
+                    Text(viewModel.clothing.value!!.imageName, style = Typography.bodyMedium)
                 }
                 Spacer(modifier = Modifier
                     .height(8.dp))

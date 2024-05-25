@@ -41,6 +41,7 @@ class ClothingRepository @Inject constructor(private val api: ClothingApi) {
                 } else {
                     result.value = Resource.error("Failed to get clothing list", null)
                 }
+
             }
 
             override fun onFailure(call: Call<List<Clothing>>, t: Throwable) {

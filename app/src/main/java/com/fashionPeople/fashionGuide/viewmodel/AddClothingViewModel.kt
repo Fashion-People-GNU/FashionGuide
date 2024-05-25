@@ -49,11 +49,11 @@ class AddClothingViewModel @Inject constructor(
         get() = _isLoading
 
     fun init(){
-        val initClothing = Clothing(0,"",0)
+        val initClothing = Clothing(0,"","")
         _clothing.value = initClothing
     }
     fun setClothingName(name: String){
-        clothing.value?.name = name
+        clothing.value?.imageName = name
     }
     fun setClothingUri(uri: Uri){
         _clothingUri.value = uri
@@ -63,7 +63,7 @@ class AddClothingViewModel @Inject constructor(
     fun addClothing(imagePart: MultipartBody.Part) {
         viewModelScope.launch {
             val uid = AccountAssistant.getUID() ?: return@launch  // UID가 null이면 함수를 종료
-            val clothingName = clothing.value?.name ?: return@launch  // clothing의 이름이 null이면 함수를 종료
+            val clothingName = clothing.value?.imageName ?: return@launch  // clothing의 이름이 null이면 함수를 종료
 
             Log.d("test2", clothingName)  // 로그 출력
             repository.addClothing(uid, clothingName, imagePart).observeForever { resource ->
