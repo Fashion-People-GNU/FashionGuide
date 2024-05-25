@@ -4,6 +4,7 @@ import com.fashionPeople.fashionGuide.data.Clothing
 import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.http.DELETE
+import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
@@ -19,8 +20,8 @@ interface ClothingApi {
     ): Call<Void>
 
     // 옷 불러오는 통신 api
-    @POST("clothes")
-    fun getClothingList(): Call<List<Clothing>>
+    @GET("clothes/{uid}")
+    fun getClothingList(@Path("uid") uid: String): Call<List<Clothing>>
 
     @DELETE("clothes/{id}")
     fun deleteClothing(@Path("id") id: Int): Call<Unit>
