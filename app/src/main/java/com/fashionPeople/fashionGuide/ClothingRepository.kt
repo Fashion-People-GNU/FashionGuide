@@ -19,7 +19,6 @@ class ClothingRepository @Inject constructor(private val api: ClothingApi) {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     result.postValue(Resource.success(null))
-                    Log.d("test", "성공?")
                 } else {
                     result.postValue(Resource.error("Failed to add clothing", null))  // 실패 상태 포스트
 
@@ -35,7 +34,7 @@ class ClothingRepository @Inject constructor(private val api: ClothingApi) {
     // getClothingList() 함수를 통해 옷리스트를 통신을 통해 불러오는 코드
     fun getClothingList(): LiveData<Resource<List<Clothing>>> {
         val result = MutableLiveData<Resource<List<Clothing>>>()
-        api.getClothingList().enqueue(object : Callback<List<Clothing>> {
+        api.getClothingList(AccountAssistant.getUID()!!).enqueue(object : Callback<List<Clothing>> {
             override fun onResponse(call: Call<List<Clothing>>, response: Response<List<Clothing>>) {
                 if (response.isSuccessful) {
                     result.value = Resource.success(response.body()!!)
