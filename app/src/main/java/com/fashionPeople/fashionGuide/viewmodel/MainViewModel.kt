@@ -44,6 +44,7 @@ class MainViewModel @Inject constructor(
                 }
                 Status.ERROR -> {
                     // 에러 처리, 예를 들어 사용자에게 메시지 표시
+                    setCloth()
                     Log.d("test", "Error adding clothing: ${resource.message}")
 
                 }
