@@ -1,5 +1,6 @@
 package com.fashionPeople.fashionGuide
 
+import com.fashionPeople.fashionGuide.data.Clothing
 import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.http.DELETE
@@ -16,6 +17,10 @@ interface ClothingApi {
         @Part("imageName") imageName: String,
         @Part image: MultipartBody.Part
     ): Call<Void>
+
+    // 옷 불러오는 통신 api
+    @POST("clothes")
+    fun getClothingList(): Call<List<Clothing>>
 
     @DELETE("clothes/{id}")
     fun deleteClothing(@Path("id") id: Int): Call<Unit>

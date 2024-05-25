@@ -27,7 +27,25 @@ class ClothingRepository @Inject constructor(private val api: ClothingApi) {
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
-                result.postValue(Resource.error("Network error", null))
+                result.postValue(Resource.error("통신 오류", null))
+            }
+        })
+        return result
+    }
+    // getClothingList() 함수를 통해 옷리스트를 통신을 통해 불러오는 코드
+    fun getClothingList(): LiveData<Resource<List<Clothing>>> {
+        val result = MutableLiveData<Resource<List<Clothing>>>()
+        api.getClothingList().enqueue(object : Callback<List<Clothing>> {
+            override fun onResponse(call: Call<List<Clothing>>, response: Response<List<Clothing>>) {
+                if (response.isSuccessful) {
+                    result.value = Resource.success(response.body()!!)
+                } else {
+                    result.value = Resource.error("Failed to get clothing list", null)
+                }
+            }
+
+            override fun onFailure(call: Call<List<Clothing>>, t: Throwable) {
+                result.value = Resource.error("Network error", null)
             }
         })
         return result
