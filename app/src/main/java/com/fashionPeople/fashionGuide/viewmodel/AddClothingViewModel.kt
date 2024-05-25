@@ -49,7 +49,7 @@ class AddClothingViewModel @Inject constructor(
         get() = _isLoading
 
     fun init(){
-        val initClothing = Clothing(0,"","")
+        val initClothing = Clothing("","","")
         _clothing.value = initClothing
     }
     fun setClothingName(name: String){

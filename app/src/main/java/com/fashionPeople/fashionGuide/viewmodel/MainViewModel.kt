@@ -59,7 +59,7 @@ class MainViewModel @Inject constructor(
         _bottomSheetOpen.value = isBottomSheet
     }
 
-    fun deleteClothing(id: Int) {
+    fun deleteClothing(id: String) {
         repository.deleteClothing(id).observeForever { resource ->
             if (resource.status == Status.SUCCESS) {
                 _clothingLiveData.value = _clothingLiveData.value.orEmpty().filterNot { it.id == id }
@@ -68,7 +68,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun setCloth(){
-        val testList : List<Clothing> = listOf(Clothing(1,"테스트 옷","https://i.namu.wiki/i/8e4XLC6zL2-NsKYEutHbkCTPOTZehEKDsFBIIADszpYkLpvpmj8nQpOaRtmfYWFBr50rNovvVPyQB1TSD6Q0Rw.webp"))
+        val testList : List<Clothing> = listOf(Clothing("","테스트 옷","https://i.namu.wiki/i/8e4XLC6zL2-NsKYEutHbkCTPOTZehEKDsFBIIADszpYkLpvpmj8nQpOaRtmfYWFBr50rNovvVPyQB1TSD6Q0Rw.webp"))
         _clothingLiveData.value = testList
     }
 }

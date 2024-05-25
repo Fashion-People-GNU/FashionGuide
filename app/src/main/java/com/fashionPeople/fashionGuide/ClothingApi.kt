@@ -24,5 +24,5 @@ interface ClothingApi {
     fun getClothingList(@Path("uid") uid: String): Call<List<Clothing>>
 
     @DELETE("clothes/{id}")
-    fun deleteClothing(@Path("id") id: Int): Call<Unit>
+    fun deleteClothing(@Path("id") id: String): Call<Unit>
 }

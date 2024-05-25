@@ -51,7 +51,7 @@ class ClothingRepository @Inject constructor(private val api: ClothingApi) {
         return result
     }
 
-    fun deleteClothing(id: Int): LiveData<Resource<Unit>> {
+    fun deleteClothing(id: String): LiveData<Resource<Unit>> {
         val result = MutableLiveData<Resource<Unit>>()
         api.deleteClothing(id).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {

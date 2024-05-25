@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Clothing(
-    val id: Int,
+    val id: String,
     var imageName: String,
     val imageUrl: String
 ) : Parcelable
