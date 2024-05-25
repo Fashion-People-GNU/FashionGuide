@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    viewModel.setCloth()
+                    //viewModel.setCloth()
                     MainScreen(viewModel)
                 }
             }
