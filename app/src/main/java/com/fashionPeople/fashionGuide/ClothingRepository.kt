@@ -1,6 +1,5 @@
 package com.fashionPeople.fashionGuide
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.fashionPeople.fashionGuide.data.Clothing
@@ -11,8 +10,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import javax.inject.Inject
 
-class ClothingRepository @Inject constructor(private val api: ClothingApi) {
-    fun addClothing(uid: String, imageName: String, image: MultipartBody.Part): LiveData<Resource<Any?>> {
+open class ClothingRepository @Inject constructor(private val api: ClothingApi) {
+    open fun addClothing(uid: String, imageName: String, image: MultipartBody.Part): LiveData<Resource<Any?>> {
         val result = MutableLiveData<Resource<Any?>>()
         result.postValue(Resource.loading(null))  // 초기 로딩 상태 설정
         api.addClothing(uid, imageName, image).enqueue(object : Callback<Void> {
@@ -32,7 +31,7 @@ class ClothingRepository @Inject constructor(private val api: ClothingApi) {
         return result
     }
     // getClothingList() 함수를 통해 옷리스트를 통신을 통해 불러오는 코드
-    fun getClothingList(): LiveData<Resource<List<Clothing>>> {
+    open fun getClothingList(): LiveData<Resource<List<Clothing>>> {
         val result = MutableLiveData<Resource<List<Clothing>>>()
         api.getClothingList(AccountAssistant.getUID()!!).enqueue(object : Callback<List<Clothing>> {
             override fun onResponse(call: Call<List<Clothing>>, response: Response<List<Clothing>>) {
@@ -51,7 +50,7 @@ class ClothingRepository @Inject constructor(private val api: ClothingApi) {
         return result
     }
 
-    fun deleteClothing(id: String): LiveData<Resource<Unit>> {
+    open fun deleteClothing(id: String): LiveData<Resource<Unit>> {
         val result = MutableLiveData<Resource<Unit>>()
         api.deleteClothing(id).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
