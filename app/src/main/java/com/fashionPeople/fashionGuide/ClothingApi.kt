@@ -25,4 +25,14 @@ interface ClothingApi {
 
     @DELETE("clothes/{id}")
     fun deleteClothing(@Path("id") id: String): Call<Unit>
+
+    //옷을 업데이트 하는 api
+    @Multipart
+    @POST("clothes/{id}")
+    fun updateClothing(
+        @Path("id") id: String,
+        @Part("uid") uid: String,
+        @Part("imageName") imageName: String,
+        @Part image: MultipartBody.Part
+    ): Call<Void>
 }
