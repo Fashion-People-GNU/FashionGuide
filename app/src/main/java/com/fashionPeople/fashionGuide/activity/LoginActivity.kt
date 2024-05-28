@@ -24,6 +24,7 @@ class LoginActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     LoginScreen(LocalContext.current, this)
+                    //컴포즈 화면을 띄워주는 코드
                 }
             }
         }

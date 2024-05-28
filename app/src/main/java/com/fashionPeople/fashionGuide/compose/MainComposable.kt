@@ -34,7 +34,6 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -57,7 +56,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -70,6 +68,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
@@ -82,10 +81,11 @@ import com.fashionPeople.fashionGuide.activity.AddClothingActivity
 import com.fashionPeople.fashionGuide.activity.DetailedClothingActivity
 import com.fashionPeople.fashionGuide.data.Clothing
 import com.fashionPeople.fashionGuide.data.Screen
+import com.fashionPeople.fashionGuide.data.TodayDate
+import com.fashionPeople.fashionGuide.data.Weather
 import com.fashionPeople.fashionGuide.ui.theme.Typography
 import com.fashionPeople.fashionGuide.ui.theme.WhiteGray
 import com.fashionPeople.fashionGuide.viewmodel.MainViewModel
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -131,11 +131,11 @@ fun MainScreen(viewModel: MainViewModel) {
 
             }
             composable(Screen.Closet.route) {
-                ClosetScreen(viewModel.clothingLiveData.value!!)
+                ClosetScreen(viewModel.clothingLiveData.value,viewModel.weather.value, viewModel.todayDate.value)
             }
             composable(Screen.Settings.route) {
 
-                SettingsScreen()
+                SettingsScreen(viewModel)
 
             }
         }
@@ -370,7 +370,7 @@ fun HomeScreen(viewModel: MainViewModel){
         }
 
         CustomTabs(viewModel)
-        WeatherBox()
+        WeatherBox(viewModel.weather.value,viewModel.todayDate.value)
 
         if (viewModel.isTabScreen.value == 0) {
             EntireRecommendation()
@@ -416,7 +416,7 @@ fun PartialRecommendation(){
 }
 
 @Composable
-fun ClosetScreen(clothes: List<Clothing>){
+fun ClosetScreen(clothes: List<Clothing>?,weather: Weather,todayDate: TodayDate){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -434,14 +434,17 @@ fun ClosetScreen(clothes: List<Clothing>){
                 text = "옷장")
         }
 
-        WeatherBox()
-        GridLayout(clothes)
+        WeatherBox(weather,todayDate)
+        if (clothes != null) {
+            GridLayout(clothes)
+        }
+
     }
 
 }
 
 @Composable
-private fun WeatherBox() {
+private fun WeatherBox(weather: Weather,todayDate: TodayDate) {
     Text(
         modifier = Modifier.fillMaxWidth(),
         textAlign = TextAlign.Left,
@@ -457,7 +460,7 @@ private fun WeatherBox() {
             contentDescription = "place"
         )
         Text(
-            text = "서울시"
+            text = weather.region
         )
     }
     Column(
@@ -474,11 +477,11 @@ private fun WeatherBox() {
                 .padding(4.dp)
         ) {
             Text(
-                text = "금 ",
+                text = "${todayDate.month}월 ${todayDate.day}일 ",
                 fontSize = 20.sp,
             )
             Text(
-                text = "4월 19일",
+                text = todayDate.dayOfWeek,
                 fontSize = 20.sp,
             )
         }
@@ -488,13 +491,13 @@ private fun WeatherBox() {
                 .padding(4.dp)
         ) {
             Text(
-                text = "24",
+                text = weather.maxTemp.toString(),
             )
             Text(
                 text = "/",
             )
             Text(
-                text = "13",
+                text = weather.minTemp.toString(),
             )
             Text(
                 text = "°C",
@@ -577,7 +580,8 @@ fun TestGridItem(clothing: Clothing) {
 }
 
 @Composable
-fun SettingsScreen(){
+fun SettingsScreen(viewModel: MainViewModel){
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -594,18 +598,30 @@ fun SettingsScreen(){
                 textAlign = TextAlign.Center,
                 text = "설정")
         }
+        if (viewModel.isDialogScreen.value == 1) {
+            DialogScreen(viewModel)
+        }
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(2.dp)
                 .background(WhiteGray)
         )
-        Text(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            style = Typography.bodyMedium,
-            text = "지역 설정")
+                .clickable {
+                    viewModel.getRegion(context as Activity)
+                },
+        ) {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                style = Typography.bodyMedium,
+                text = "지역 설정")
+        }
+
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
@@ -639,6 +655,27 @@ fun SettingsScreen(){
                 .height(1.dp)
                 .background(WhiteGray)
         )
+    }
+}
+
+@Composable
+fun DialogScreen(viewModel: MainViewModel){
+    val region = viewModel.weather.value.region
+    Dialog(onDismissRequest = { viewModel.setDialogScreen(0) }) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+
+        ) {
+            Text("지역 설정")
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("현재 사는 지역: $region", style = Typography.bodyMedium)
+            Text("설정 완료", style = Typography.bodyMedium)
+        }
     }
 }
 
