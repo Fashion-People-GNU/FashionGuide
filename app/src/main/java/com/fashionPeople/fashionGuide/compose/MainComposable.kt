@@ -53,6 +53,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,6 +70,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
@@ -131,7 +133,7 @@ fun MainScreen(viewModel: MainViewModel) {
 
             }
             composable(Screen.Closet.route) {
-                ClosetScreen(viewModel.clothingLiveData.value,viewModel.weather.value, viewModel.todayDate.value)
+                ClosetScreen(viewModel)
             }
             composable(Screen.Settings.route) {
 
@@ -416,7 +418,10 @@ fun PartialRecommendation(){
 }
 
 @Composable
-fun ClosetScreen(clothes: List<Clothing>?,weather: Weather,todayDate: TodayDate){
+fun ClosetScreen(viewModel: MainViewModel){
+    val clothingList by viewModel.clothingLiveData.observeAsState()
+    val weather by viewModel.weather
+    val todayDate by viewModel.todayDate
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -435,9 +440,7 @@ fun ClosetScreen(clothes: List<Clothing>?,weather: Weather,todayDate: TodayDate)
         }
 
         WeatherBox(weather,todayDate)
-        if (clothes != null) {
-            GridLayout(clothes)
-        }
+        clothingList?.let { GridLayout(it) }
 
     }
 

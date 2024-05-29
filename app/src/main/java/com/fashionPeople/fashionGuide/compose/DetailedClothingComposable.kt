@@ -49,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -69,7 +70,7 @@ import com.fashionPeople.fashionGuide.viewmodel.DetailedClothingViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailedClothingScreen(activity: Activity, viewModel: DetailedClothingViewModel) {
-
+    //옷 삭제하는 버튼 추가
     Scaffold(
         topBar = { TopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(
@@ -82,7 +83,17 @@ fun DetailedClothingScreen(activity: Activity, viewModel: DetailedClothingViewMo
                 IconButton(onClick = { activity.finish() }) {
                     Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "back")
                 }
+            },
+            //삭제 버튼
+            actions = {
+                IconButton(onClick = {
+                    viewModel.deleteClothing()
+                    activity.finish()
+                }) {
+                    Icon(imageVector = Icons.Filled.Add, contentDescription = "delete")
+                }
             }
+
             ) },
     ) { innerPaddingModifier ->
 

@@ -1,8 +1,10 @@
 package com.fashionPeople.fashionGuide
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.fashionPeople.fashionGuide.data.Clothing
+import com.fashionPeople.fashionGuide.data.Event
 import com.fashionPeople.fashionGuide.data.Resource
 import okhttp3.MultipartBody
 import retrofit2.Call
@@ -10,7 +12,23 @@ import retrofit2.Callback
 import retrofit2.Response
 import javax.inject.Inject
 
+/**
+ * Repository class for managing clothing data.
+ *
+ * @property api The ClothingApi instance for making network requests.
+ */
 open class ClothingRepository @Inject constructor(private val api: ClothingApi) {
+    private val _event = MutableLiveData<Event<Unit>>()
+    val event: LiveData<Event<Unit>> = _event
+
+    /**
+     * Adds a clothing item.
+     *
+     * @param uid The user ID.
+     * @param imageName The name of the image.
+     * @param image The image file.
+     * @return LiveData containing the result of the operation.
+     */
     open fun addClothing(uid: String, imageName: String, image: MultipartBody.Part): LiveData<Resource<Any?>> {
         val result = MutableLiveData<Resource<Any?>>()
         result.postValue(Resource.loading(null))  // 초기 로딩 상태 설정
@@ -18,12 +36,12 @@ open class ClothingRepository @Inject constructor(private val api: ClothingApi) 
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     result.postValue(Resource.success(null))
+                    _event.postValue(Event(Unit))
                 } else {
                     result.postValue(Resource.error("Failed to add clothing", null))  // 실패 상태 포스트
 
                 }
             }
-
             override fun onFailure(call: Call<Void>, t: Throwable) {
                 result.postValue(Resource.error("통신 오류", null))
             }
@@ -58,6 +76,7 @@ open class ClothingRepository @Inject constructor(private val api: ClothingApi) 
                     result.value = Resource.success(Unit)
                 } else {
                     result.value = Resource.error("Failed to delete clothing", null)
+                    Log.d("test",response.message())
                 }
             }
 

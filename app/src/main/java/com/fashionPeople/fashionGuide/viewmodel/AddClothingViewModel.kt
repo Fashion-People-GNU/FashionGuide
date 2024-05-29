@@ -39,6 +39,7 @@ class AddClothingViewModel @Inject constructor(
     val errorMessage: LiveData<Event<String>> get() = _errorMessage
     val closeActivityEvent: LiveData<Event<Unit>> = _closeActivityEvent
 
+
     val clothing : LiveData<Clothing>
         get() = _clothing
 
@@ -65,14 +66,14 @@ class AddClothingViewModel @Inject constructor(
             val uid = AccountAssistant.getUID() ?: return@launch  // UID가 null이면 함수를 종료
             val clothingName = clothing.value?.imageName ?: return@launch  // clothing의 이름이 null이면 함수를 종료
 
-            Log.d("test2", clothingName)  // 로그 출력
             repository.addClothing(uid, clothingName, imagePart).observeForever { resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
                         _errorMessage.postValue(Event(resource.message ?: "통신 성공"))
                         _closeActivityEvent.postValue(Event(Unit))  // 성공시 액티비티 종료 이벤트
                         _isLoading.value = false
-                        Log.d("test","tt")
+
+                        Log.d("test","통신 성공")
                     }
                     Status.ERROR -> {
                         // 에러 처리, 예를 들어 사용자에게 메시지 표시
@@ -102,4 +103,6 @@ class AddClothingViewModel @Inject constructor(
 
         return MultipartBody.Part.createFormData("image", outputFile.name, imageRequestBody)
     }
+
+
 }

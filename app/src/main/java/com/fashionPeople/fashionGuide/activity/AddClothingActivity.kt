@@ -1,5 +1,6 @@
 package com.fashionPeople.fashionGuide.activity
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -30,6 +31,7 @@ import com.fashionPeople.fashionGuide.data.SizeOption
 import com.fashionPeople.fashionGuide.ui.theme.FashionGuideTheme
 import com.fashionPeople.fashionGuide.viewmodel.AddClothingViewModel
 import com.fashionPeople.fashionGuide.viewmodel.DetailedClothingViewModel
+import com.fashionPeople.fashionGuide.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.migration.CustomInjection.inject
 

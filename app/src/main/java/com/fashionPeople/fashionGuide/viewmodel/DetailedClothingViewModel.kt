@@ -1,5 +1,6 @@
 package com.fashionPeople.fashionGuide.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.fashionPeople.fashionGuide.ClothingRepository
@@ -21,6 +22,16 @@ class DetailedClothingViewModel @Inject constructor(
     fun setCloth(clothing: Clothing){
         _clothing.value = clothing
     }
-    // getClothingList() 함수를 통해 옷리스트를 통신을 통해 불러오는 코드
+    // 옷 삭제
+    fun deleteClothing(){
+        repository.deleteClothing(_clothing.value!!.id).observeForever {
+            if(it.status == Status.SUCCESS){
+                Log.d("deleteClothing", "success")
+            }
+            else{
+                Log.d("deleteClothing", "${it.status}")
+            }
+        }
+    }
 
 }

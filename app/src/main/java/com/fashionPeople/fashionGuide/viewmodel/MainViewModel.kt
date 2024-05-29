@@ -12,18 +12,23 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.fashionPeople.fashionGuide.AccountAssistant
 import com.fashionPeople.fashionGuide.ClothingRepository
 import com.fashionPeople.fashionGuide.data.Clothing
+import com.fashionPeople.fashionGuide.data.Event
 import com.fashionPeople.fashionGuide.data.Status
 import com.fashionPeople.fashionGuide.data.TodayDate
 import com.fashionPeople.fashionGuide.data.Weather
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
@@ -31,6 +36,8 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val repository: ClothingRepository
 ): ViewModel() {
+    private val _repositoryEvent = repository.event
+
     private val _clothingLiveData = MutableLiveData<List<Clothing>?>()
     private val _bottomSheetOpen = mutableStateOf(false)
     private val _isTabScreen = mutableIntStateOf(0)
@@ -39,6 +46,9 @@ class MainViewModel @Inject constructor(
     private val _weather = mutableStateOf(Weather("없음", 0.0, 0.0, 0.0, 0, "없음"))
     val clothingLiveData: MutableLiveData<List<Clothing>?>
         get() = _clothingLiveData
+
+    val repositoryEvent: LiveData<Event<Unit>>
+        get() = _repositoryEvent
 
     val bottomSheetOpen: MutableState<Boolean>
         get() = _bottomSheetOpen
@@ -55,12 +65,15 @@ class MainViewModel @Inject constructor(
     val todayDate: MutableState<TodayDate>
         get() = _todayDate
 
+
     fun setTabScreen(tab: Int){
         _isTabScreen.intValue = tab
     }
 
-    fun init(){
+    init {
         getClothingList()
+    }
+    fun init(){
         getDate()
         _weather.value.region = AccountAssistant.getData("region") ?: "없음"
     }
@@ -113,12 +126,12 @@ class MainViewModel @Inject constructor(
         repository.getClothingList().observeForever { resource ->
             when (resource.status) {
                 Status.SUCCESS -> {
-                    _clothingLiveData.value = resource.data
-                    Log.d("test","tt")
+                    _clothingLiveData.postValue(resource.data)
+                    Log.d("test","데이터 가져옴")
                 }
                 Status.ERROR -> {
                     // 에러 처리, 예를 들어 사용자에게 메시지 표시
-                    _clothingLiveData.value = listOf()
+                    _clothingLiveData.postValue(listOf())
                     Log.d("test", "Error adding clothing: ${resource.message}")
 
                 }
