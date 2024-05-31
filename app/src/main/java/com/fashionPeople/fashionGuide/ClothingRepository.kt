@@ -5,21 +5,32 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.fashionPeople.fashionGuide.data.Clothing
 import com.fashionPeople.fashionGuide.data.Event
+import com.fashionPeople.fashionGuide.data.EventList
 import com.fashionPeople.fashionGuide.data.Resource
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Repository class for managing clothing data.
  *
  * @property api The ClothingApi instance for making network requests.
  */
+@Singleton
 open class ClothingRepository @Inject constructor(private val api: ClothingApi) {
-    private val _event = MutableLiveData<Event<Unit>>()
-    val event: LiveData<Event<Unit>> = _event
+    private val _event = MutableLiveData<Event<EventList>>()
+    val event: MutableLiveData<Event<EventList>> get() = _event
+
+    fun setEvent(event: EventList) {
+        _event.value = Event(event)
+        Log.d("test","set${event}")
+    }
 
     /**
      * Adds a clothing item.
@@ -36,14 +47,15 @@ open class ClothingRepository @Inject constructor(private val api: ClothingApi) 
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     result.postValue(Resource.success(null))
-                    _event.postValue(Event(Unit))
                 } else {
-                    result.postValue(Resource.error("Failed to add clothing", null))  // 실패 상태 포스트
+                    Log.d("test",response.toString())
+                    result.postValue(Resource.error("옷 사진이 아닙니다", null))  // 실패 상태 포스트
 
                 }
             }
             override fun onFailure(call: Call<Void>, t: Throwable) {
                 result.postValue(Resource.error("통신 오류", null))
+                Log.d("test",t.toString())
             }
         })
         return result
@@ -56,6 +68,7 @@ open class ClothingRepository @Inject constructor(private val api: ClothingApi) 
                 if (response.isSuccessful) {
                     result.value = Resource.success(response.body()!!)
                 } else {
+                    Log.d("test",response.toString())
                     result.value = Resource.error("Failed to get clothing list", null)
                 }
 
@@ -68,15 +81,16 @@ open class ClothingRepository @Inject constructor(private val api: ClothingApi) 
         return result
     }
 
-    open fun deleteClothing(id: String): LiveData<Resource<Unit>> {
+    open fun deleteClothing(uid: String,id: String): LiveData<Resource<Unit>> {
         val result = MutableLiveData<Resource<Unit>>()
-        api.deleteClothing(id).enqueue(object : Callback<Unit> {
+        api.deleteClothing(uid,id).enqueue(object : Callback<Unit> {
             override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                 if (response.isSuccessful) {
                     result.value = Resource.success(Unit)
+                    Log.d("test",response.toString())
                 } else {
                     result.value = Resource.error("Failed to delete clothing", null)
-                    Log.d("test",response.message())
+                    Log.d("test",response.toString())
                 }
             }
 
@@ -86,6 +100,7 @@ open class ClothingRepository @Inject constructor(private val api: ClothingApi) 
         })
         return result
     }
+
 
     //옷장 업데이트 api 호출
     open fun updateClothing(id: String, imageName: String, image: MultipartBody.Part): LiveData<Resource<Any?>> {

@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -422,25 +423,34 @@ fun ClosetScreen(viewModel: MainViewModel){
     val clothingList by viewModel.clothingLiveData.observeAsState()
     val weather by viewModel.weather
     val todayDate by viewModel.todayDate
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
-    ) {
-        Box(
+
+
+    Box {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
+                .fillMaxSize()
+                .padding(8.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
 
-            ) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                text = "옷장")
+                ) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    text = "옷장")
+            }
+
+            WeatherBox(weather,todayDate)
+            clothingList?.let { GridLayout(it) }
+
         }
-
-        WeatherBox(weather,todayDate)
-        clothingList?.let { GridLayout(it) }
+        if (viewModel.isLoading.value) {
+            Log.d("test", "loading")
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
 
     }
 

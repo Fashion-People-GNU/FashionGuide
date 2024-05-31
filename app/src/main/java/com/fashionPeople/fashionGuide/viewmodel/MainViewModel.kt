@@ -23,6 +23,7 @@ import com.fashionPeople.fashionGuide.AccountAssistant
 import com.fashionPeople.fashionGuide.ClothingRepository
 import com.fashionPeople.fashionGuide.data.Clothing
 import com.fashionPeople.fashionGuide.data.Event
+import com.fashionPeople.fashionGuide.data.EventList
 import com.fashionPeople.fashionGuide.data.Status
 import com.fashionPeople.fashionGuide.data.TodayDate
 import com.fashionPeople.fashionGuide.data.Weather
@@ -36,7 +37,8 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val repository: ClothingRepository
 ): ViewModel() {
-    private val _repositoryEvent = repository.event
+
+    private val _event = repository.event
 
     private val _clothingLiveData = MutableLiveData<List<Clothing>?>()
     private val _bottomSheetOpen = mutableStateOf(false)
@@ -44,11 +46,16 @@ class MainViewModel @Inject constructor(
     private val _isDialogScreen = mutableIntStateOf(0)
     private val _todayDate = mutableStateOf(TodayDate(0,0,0,"없음"))
     private val _weather = mutableStateOf(Weather("없음", 0.0, 0.0, 0.0, 0, "없음"))
+
+    private val _isLoading = mutableStateOf(false)
+
+    val isLoading : MutableState<Boolean>
+        get() = _isLoading
     val clothingLiveData: MutableLiveData<List<Clothing>?>
         get() = _clothingLiveData
 
-    val repositoryEvent: LiveData<Event<Unit>>
-        get() = _repositoryEvent
+    val event : LiveData<Event<EventList>>
+        get() = _event
 
     val bottomSheetOpen: MutableState<Boolean>
         get() = _bottomSheetOpen
@@ -72,6 +79,7 @@ class MainViewModel @Inject constructor(
 
     init {
         getClothingList()
+        Log.d("test",repository.hashCode().toString())
     }
     fun init(){
         getDate()
@@ -127,16 +135,18 @@ class MainViewModel @Inject constructor(
             when (resource.status) {
                 Status.SUCCESS -> {
                     _clothingLiveData.postValue(resource.data)
+                    isLoading.value = false
                     Log.d("test","데이터 가져옴")
                 }
                 Status.ERROR -> {
+                    isLoading.value = false
                     // 에러 처리, 예를 들어 사용자에게 메시지 표시
                     _clothingLiveData.postValue(listOf())
                     Log.d("test", "Error adding clothing: ${resource.message}")
 
                 }
                 Status.LOADING -> {
-
+                    isLoading.value = true
                 }
             }
 
@@ -147,11 +157,16 @@ class MainViewModel @Inject constructor(
     }
 
     fun deleteClothing(id: String) {
-        repository.deleteClothing(id).observeForever { resource ->
-            if (resource.status == Status.SUCCESS) {
-                _clothingLiveData.value = _clothingLiveData.value.orEmpty().filterNot { it.id == id }
+        viewModelScope.launch {
+            repository.deleteClothing(AccountAssistant.getUID()!!,id).observeForever { resource ->
+                if (resource.status == Status.SUCCESS) {
+                    _clothingLiveData.value = _clothingLiveData.value.orEmpty().filterNot { it.id == id }
+                }
             }
         }
+
+
+
     }
 
     fun setCloth(){

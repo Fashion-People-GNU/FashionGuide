@@ -82,11 +82,6 @@ import java.io.File
 fun AddClothingScreen(viewModel: AddClothingViewModel) {
     val context = LocalContext.current
     val imagePart = remember { viewModel.createImagePartFromUri(context, viewModel.clothingUri.value!!)}
-    viewModel.errorMessage.observe(context as AddClothingActivity) { event ->
-        event.getContentIfNotHandled()?.let {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-        }
-    }
 
     Scaffold(
         modifier = Modifier
@@ -157,7 +152,7 @@ fun AddClothingScreen(viewModel: AddClothingViewModel) {
                     shape = RoundedCornerShape(0.dp),
                     onClick = {
                         viewModel.addClothing(imagePart)
-                        Log.d("test", viewModel.isLoading.value.toString())}
+                        Log.d("test", "터치")}
                 ) {
                     Text(text = "저장", style = Typography.bodyLarge)
                     //로딩화면

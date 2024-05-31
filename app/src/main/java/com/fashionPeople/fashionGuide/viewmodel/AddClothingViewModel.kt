@@ -13,11 +13,9 @@ import com.fashionPeople.fashionGuide.AccountAssistant
 import com.fashionPeople.fashionGuide.ClothingRepository
 import com.fashionPeople.fashionGuide.data.Clothing
 import com.fashionPeople.fashionGuide.data.Event
+import com.fashionPeople.fashionGuide.data.EventList
 import com.fashionPeople.fashionGuide.data.Status
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -35,8 +33,7 @@ class AddClothingViewModel @Inject constructor(
     private val _clothingUri = MutableLiveData<Uri>()
     private val _isLoading = mutableStateOf(false)
     private val _closeActivityEvent = MutableLiveData<Event<Unit>>()
-    private val _errorMessage = MutableLiveData<Event<String>>()
-    val errorMessage: LiveData<Event<String>> get() = _errorMessage
+
     val closeActivityEvent: LiveData<Event<Unit>> = _closeActivityEvent
 
 
@@ -61,6 +58,10 @@ class AddClothingViewModel @Inject constructor(
     }
 
 
+    init {
+
+    }
+
     fun addClothing(imagePart: MultipartBody.Part) {
         viewModelScope.launch {
             val uid = AccountAssistant.getUID() ?: return@launch  // UID가 null이면 함수를 종료
@@ -69,15 +70,13 @@ class AddClothingViewModel @Inject constructor(
             repository.addClothing(uid, clothingName, imagePart).observeForever { resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
-                        _errorMessage.postValue(Event(resource.message ?: "통신 성공"))
                         _closeActivityEvent.postValue(Event(Unit))  // 성공시 액티비티 종료 이벤트
+                        repository.setEvent(EventList.ADD)//추가 성공 이벤트를 보냄
                         _isLoading.value = false
-
                         Log.d("test","통신 성공")
                     }
                     Status.ERROR -> {
                         // 에러 처리, 예를 들어 사용자에게 메시지 표시
-                        _errorMessage.postValue(Event(resource.message ?: "통신 오류"))  // 에러 발생 시 메시지 이벤트 발생
                         Log.d("AddClothingVM", "Error adding clothing: ${resource.message}")
                         _isLoading.value = false
                     }

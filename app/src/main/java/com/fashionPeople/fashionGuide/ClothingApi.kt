@@ -23,12 +23,16 @@ interface ClothingApi {
     @GET("clothes/{uid}")
     fun getClothingList(@Path("uid") uid: String): Call<List<Clothing>>
 
-    @DELETE("clothes/{id}")
-    fun deleteClothing(@Path("id") id: String): Call<Unit>
+    @DELETE("closet/delete/{uid}/{cloth_id}")
+    fun deleteClothing(
+        @Path("uid") uid: String,
+        @Path("cloth_id") id: String
+    ): Call<Unit>
+
 
     //옷을 업데이트 하는 api
     @Multipart
-    @POST("clothes/{id}")
+    @DELETE("closet/{id}")
     fun updateClothing(
         @Path("id") id: String,
         @Part("uid") uid: String,

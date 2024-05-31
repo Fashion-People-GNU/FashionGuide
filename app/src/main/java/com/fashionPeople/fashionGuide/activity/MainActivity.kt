@@ -1,11 +1,10 @@
 package com.fashionPeople.fashionGuide.activity
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -14,17 +13,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.viewModelScope
-import com.fashionPeople.fashionGuide.ClothingRepository
 import com.fashionPeople.fashionGuide.compose.MainScreen
+import com.fashionPeople.fashionGuide.data.EventList
 import com.fashionPeople.fashionGuide.ui.theme.FashionGuideTheme
-import com.fashionPeople.fashionGuide.viewmodel.AddClothingViewModel
-import com.fashionPeople.fashionGuide.viewmodel.DetailedClothingViewModel
 import com.fashionPeople.fashionGuide.viewmodel.MainViewModel
-import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.migration.CustomInjection.inject
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -32,10 +25,8 @@ class MainActivity : ComponentActivity() {
 
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        observeViewModel()
         setContent {
             FashionGuideTheme {
                 // A surface container using the 'background' color from the theme
@@ -62,13 +53,43 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    private fun observeViewModel() {
-        viewModel.repositoryEvent.observe(this) { event ->
-            Log.d("test", "Received event message:")
-            event.getContentIfNotHandled()?.let { message ->
-                Log.d("test", "Received event message: $message")
+    private fun observeViewModel(){
+        viewModel.event.observe(this) {
+            viewModel.event.value?.getContentIfNotHandled()?.let {
+                when(viewModel.event.value?.peekContent() as EventList){
+                    EventList.ADD -> {
+                        Log.d("test", "observeViewModel")
+                        viewModel.getClothingList()
+                        Toast.makeText(this,"추가 성공", Toast.LENGTH_SHORT).show()
+                    }
+                    EventList.DELETE -> {
+                        Log.d("test", "observeViewModel")
+                        viewModel.getClothingList()
+                        Toast.makeText(this,"삭제 성공", Toast.LENGTH_SHORT).show()
+
+                    }
+                }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        observeViewModel()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("test", "onResume")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d("test", "onStop")
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("test", "onDestroy")
     }
 
 }

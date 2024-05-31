@@ -2,6 +2,8 @@ package com.fashionPeople.fashionGuide.compose
 
 import android.app.Activity
 import android.graphics.drawable.Drawable
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -23,7 +25,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.RestoreFromTrash
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
@@ -62,6 +66,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.fashionPeople.fashionGuide.R
+import com.fashionPeople.fashionGuide.activity.AddClothingActivity
+import com.fashionPeople.fashionGuide.activity.DetailedClothingActivity
 import com.fashionPeople.fashionGuide.data.Screen
 import com.fashionPeople.fashionGuide.ui.theme.Typography
 import com.fashionPeople.fashionGuide.ui.theme.WhiteGray
@@ -70,6 +76,9 @@ import com.fashionPeople.fashionGuide.viewmodel.DetailedClothingViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailedClothingScreen(activity: Activity, viewModel: DetailedClothingViewModel) {
+    val context = LocalContext.current
+
+
     //옷 삭제하는 버튼 추가
     Scaffold(
         topBar = { TopAppBar(
@@ -90,47 +99,48 @@ fun DetailedClothingScreen(activity: Activity, viewModel: DetailedClothingViewMo
                     viewModel.deleteClothing()
                     activity.finish()
                 }) {
-                    Icon(imageVector = Icons.Filled.Add, contentDescription = "delete")
+                    Icon(imageVector = Icons.Filled.RestoreFromTrash, contentDescription = "delete")
                 }
             }
 
             ) },
     ) { innerPaddingModifier ->
+        Box {
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .padding(innerPaddingModifier),
+                horizontalAlignment = Alignment.Start
+            ){
 
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .padding(innerPaddingModifier),
-            horizontalAlignment = Alignment.Start
-        ){
-            Image(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f),
-                painter = rememberAsyncImagePainter(model = viewModel.clothing.value!!.imageUrl), contentDescription = "image")
-            Column(
-                modifier = Modifier.padding(8.dp)
-            ) {
-                Text(text = "옷 정보")
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                Image(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f),
+                    painter = rememberAsyncImagePainter(model = viewModel.clothing.value!!.imageUrl), contentDescription = "image")
+                Column(
+                    modifier = Modifier.padding(8.dp)
                 ) {
-                    Text("옷 이름: ", style = Typography.bodyMedium)
-                    Text(viewModel.clothing.value!!.imageName, style = Typography.bodyMedium)
+                    Text(text = "옷 정보")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("옷 이름: ", style = Typography.bodyMedium)
+                        Text(viewModel.clothing.value!!.imageName, style = Typography.bodyMedium)
+                    }
+                    Spacer(modifier = Modifier
+                        .height(8.dp))
+                    Divider(color = Color.LightGray, thickness = 1.dp)
+
                 }
-                Spacer(modifier = Modifier
-                    .height(8.dp))
-                Divider(color = Color.LightGray, thickness = 1.dp)
 
             }
-
+            if(viewModel.isLoading.value){
+                Log.d("test", "loading")
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
         }
-
-
-
-
-
 
 
 

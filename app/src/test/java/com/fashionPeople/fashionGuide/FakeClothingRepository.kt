@@ -36,14 +36,5 @@ class FakeClothingRepository @Inject constructor(private val api: ClothingApi) :
         return result
     }
 
-    override fun deleteClothing(id: String): LiveData<Resource<Unit>> {
-        val result = MutableLiveData<Resource<Unit>>()
-        if (shouldReturnError) {
-            result.value = Resource.error("Test exception", null)
-        } else {
-            clothingList.removeIf { it.id == id }
-            result.value = Resource.success(Unit)
-        }
-        return result
-    }
+
 }
