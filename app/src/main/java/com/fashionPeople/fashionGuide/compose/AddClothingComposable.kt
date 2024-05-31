@@ -68,6 +68,7 @@ import com.fashionPeople.fashionGuide.ClothingApi
 import com.fashionPeople.fashionGuide.NetworkModule
 import com.fashionPeople.fashionGuide.activity.AddClothingActivity
 import com.fashionPeople.fashionGuide.ui.theme.Typography
+import com.fashionPeople.fashionGuide.utils.ImageUtils
 import com.fashionPeople.fashionGuide.viewmodel.AddClothingViewModel
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -81,7 +82,6 @@ import java.io.File
 @Composable
 fun AddClothingScreen(viewModel: AddClothingViewModel) {
     val context = LocalContext.current
-    val imagePart = remember { viewModel.createImagePartFromUri(context, viewModel.clothingUri.value!!)}
 
     Scaffold(
         modifier = Modifier
@@ -151,7 +151,10 @@ fun AddClothingScreen(viewModel: AddClothingViewModel) {
                         .align(Alignment.BottomCenter),
                     shape = RoundedCornerShape(0.dp),
                     onClick = {
-                        viewModel.addClothing(imagePart)
+
+                        viewModel.addClothing(
+                            ImageUtils().createImagePartFromUri(context, viewModel.clothingUri.value!!)
+                        )
                         Log.d("test", "터치")}
                 ) {
                     Text(text = "저장", style = Typography.bodyLarge)

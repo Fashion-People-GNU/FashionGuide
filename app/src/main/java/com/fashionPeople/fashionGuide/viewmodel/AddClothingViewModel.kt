@@ -15,6 +15,8 @@ import com.fashionPeople.fashionGuide.data.Clothing
 import com.fashionPeople.fashionGuide.data.Event
 import com.fashionPeople.fashionGuide.data.EventList
 import com.fashionPeople.fashionGuide.data.Status
+import com.fashionPeople.fashionGuide.utils.ImageUtils
+import com.google.android.gms.common.images.ImageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -88,20 +90,6 @@ class AddClothingViewModel @Inject constructor(
         }
     }
 
-    fun createImagePartFromUri(context: Context, uri: Uri): MultipartBody.Part {
-        val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
-        val outputFile = File(context.cacheDir, AccountAssistant.getUID().toString() + ".jpg") // 이미지 파일의 저장 위치 설정
-
-        inputStream?.use { input ->
-            FileOutputStream(outputFile).use { output ->
-                input.copyTo(output) // 입력 스트림을 출력 스트림으로 복사하여 이미지 파일 생성
-            }
-        }
-
-        val imageRequestBody = outputFile.asRequestBody("image/*".toMediaTypeOrNull())
-
-        return MultipartBody.Part.createFormData("image", outputFile.name, imageRequestBody)
-    }
 
 
 }
