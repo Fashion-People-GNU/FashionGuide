@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
-import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.os.Build
@@ -12,7 +11,6 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.LiveData
@@ -43,7 +41,8 @@ class MainViewModel @Inject constructor(
     private val _clothingLiveData = MutableLiveData<List<Clothing>?>()
     private val _bottomSheetOpen = mutableStateOf(false)
     private val _isTabScreen = mutableIntStateOf(0)
-    private val _isDialogScreen = mutableIntStateOf(0)
+    private val _isRegionDialogScreen = mutableIntStateOf(0)
+    private val _isResultDialogScreen = mutableIntStateOf(0)
     private val _todayDate = mutableStateOf(TodayDate(0,0,0,"없음"))
     private val _weather = mutableStateOf(Weather("없음", 0.0, 0.0, 0.0, 0, "없음"))
 
@@ -63,8 +62,11 @@ class MainViewModel @Inject constructor(
     val isTabScreen: MutableState<Int>
         get() = _isTabScreen
 
-    val isDialogScreen: MutableState<Int>
-        get() = _isDialogScreen
+    val isRegionDialogScreen: MutableState<Int>
+        get() = _isRegionDialogScreen
+
+    val isResultDialogScreen: MutableState<Int>
+        get() = _isResultDialogScreen
 
     val weather: MutableState<Weather>
         get() = _weather
@@ -84,6 +86,7 @@ class MainViewModel @Inject constructor(
     fun init(){
         getDate()
         _weather.value.region = AccountAssistant.getData("region") ?: "없음"
+        weather.value = Weather("진주시", 30.5, 15.0, 24.3, 0, "맑음")
     }
 
 
@@ -108,7 +111,7 @@ class MainViewModel @Inject constructor(
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             location?.let {
                 getCityName(it.latitude, it.longitude,activity)
-                setDialogScreen(1)
+                setRegionDialogScreen(1)
             }
         }
     }
@@ -126,9 +129,14 @@ class MainViewModel @Inject constructor(
 
     }
 
-    fun setDialogScreen(dialog: Int){
-        _isDialogScreen.intValue = dialog
+    fun setRegionDialogScreen(dialog: Int){
+        _isRegionDialogScreen.intValue = dialog
     }
+
+    fun setResultDialogScreen(dialog: Int){
+        _isResultDialogScreen.intValue = dialog
+    }
+
 
     fun getClothingList(){
         repository.getClothingList().observeForever { resource ->

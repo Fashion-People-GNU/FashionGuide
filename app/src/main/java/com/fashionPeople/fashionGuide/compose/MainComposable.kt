@@ -10,8 +10,10 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -24,21 +26,26 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
@@ -46,6 +53,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -65,13 +73,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role.Companion.Button
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
@@ -113,7 +122,9 @@ fun MainScreen(viewModel: MainViewModel) {
             }
             if (currentRoute == Screen.Home.route) {
                 FloatingActionButton(
-                    onClick = { /* TODO */ }
+                    onClick = {
+                        viewModel.setResultDialogScreen(1)
+                    }
                 ) {
                     Icon(Icons.Filled.Search, contentDescription = "Search")
                 }
@@ -380,6 +391,9 @@ fun HomeScreen(viewModel: MainViewModel){
         } else {
             PartialRecommendation()
         }
+        if (viewModel.isResultDialogScreen.value == 1) {
+            ResultDialogScreen(viewModel)
+        }
 
 
     }
@@ -392,10 +406,18 @@ fun EntireRecommendation(){
         fontSize = 16.sp,
         textAlign = TextAlign.Center,
         text = "상하의를 동시에 추천하는 방식")
+    //동그란 이미지로 나오게 하기
+
     Image(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .aspectRatio(1f)
+            .padding(16.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .shadow(
+                elevation = 4.dp, // 그림자의 높이를 조정할 수 있습니다.
+                clip = true
+            ),
         alignment = Alignment.Center,
         painter = painterResource(id = R.drawable.content_image),
         contentDescription = "content")
@@ -412,7 +434,12 @@ fun PartialRecommendation(){
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1f)
-            .padding(16.dp),
+            .padding(16.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .shadow(
+                elevation = 4.dp, // 그림자의 높이를 조정할 수 있습니다.
+                clip = true
+            ),
         alignment = Alignment.Center,
         painter = painterResource(id = R.drawable.test_item),
         contentDescription = "content")
@@ -503,11 +530,23 @@ private fun WeatherBox(weather: Weather,todayDate: TodayDate) {
                 .fillMaxWidth()
                 .padding(4.dp)
         ) {
+            Image(
+                modifier = Modifier.size(35.dp)
+                    .padding(4.dp),
+                painter = painterResource(id = R.drawable.high_temp),
+                contentDescription = "high_temp"
+            )
             Text(
                 text = weather.maxTemp.toString(),
             )
             Text(
                 text = "/",
+            )
+            Image(
+                modifier = Modifier.size(35.dp)
+                    .padding(4.dp),
+                painter = painterResource(id = R.drawable.low_temp),
+                contentDescription = "low_temp"
             )
             Text(
                 text = weather.minTemp.toString(),
@@ -611,8 +650,8 @@ fun SettingsScreen(viewModel: MainViewModel){
                 textAlign = TextAlign.Center,
                 text = "설정")
         }
-        if (viewModel.isDialogScreen.value == 1) {
-            DialogScreen(viewModel)
+        if (viewModel.isRegionDialogScreen.value == 1) {
+            RegionDialogScreen(viewModel)
         }
         Spacer(
             modifier = Modifier
@@ -672,9 +711,9 @@ fun SettingsScreen(viewModel: MainViewModel){
 }
 
 @Composable
-fun DialogScreen(viewModel: MainViewModel){
+fun RegionDialogScreen(viewModel: MainViewModel){
     val region = viewModel.weather.value.region
-    Dialog(onDismissRequest = { viewModel.setDialogScreen(0) }) {
+    Dialog(onDismissRequest = { viewModel.setRegionDialogScreen(0) }) {
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(16.dp))
@@ -690,6 +729,86 @@ fun DialogScreen(viewModel: MainViewModel){
             Text("설정 완료", style = Typography.bodyMedium)
         }
     }
+}
+
+@Composable
+fun ResultDialogScreen(viewModel: MainViewModel){
+    Dialog(onDismissRequest = { viewModel.setResultDialogScreen(0) }) {
+        Surface(
+            modifier = Modifier
+                .border(
+                    BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+                    shape = RoundedCornerShape(16.dp)
+                ),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .background(MaterialTheme.colorScheme.surface),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("모델 결과(상의)",color=MaterialTheme.colorScheme.onBackground)
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        modifier = Modifier.size(48.dp),
+                        onClick = { /* Handle left arrow click */ }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Previous",
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .size(150.dp)
+                            .background(Color.Gray, shape = RoundedCornerShape(8.dp)),
+                        contentAlignment = Alignment.Center
+                    ){
+                        Image(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop,
+                            painter = painterResource(id = R.drawable.test_top),
+                            contentDescription = "Centered Image"
+                        )
+                    }
+
+                    IconButton(
+                        modifier = Modifier.size(48.dp),
+                        onClick = { /* Handle right arrow click */ }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowForward,
+                            contentDescription = "Next",
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("재킷",color=MaterialTheme.colorScheme.onBackground)
+                Button(
+                    onClick = { viewModel.setResultDialogScreen(0) },
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text("확인")
+                }
+
+            }
+        }
+    }
+
 }
 
 
