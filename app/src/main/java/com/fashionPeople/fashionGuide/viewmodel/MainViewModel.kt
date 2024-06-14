@@ -44,7 +44,8 @@ class MainViewModel @Inject constructor(
     private val _isRegionDialogScreen = mutableIntStateOf(0)
     private val _isResultDialogScreen = mutableIntStateOf(0)
     private val _todayDate = mutableStateOf(TodayDate(0,0,0,"없음"))
-    private val _weather = mutableStateOf(Weather("없음", 0.0, 0.0, 0.0, 0, "없음"))
+    private val _weather = mutableStateOf(Weather( 0.0, 0.0, 0.0, 0.0, "없음",0.0))
+    private val _region = mutableStateOf("없음")
 
     private val _isLoading = mutableStateOf(false)
 
@@ -55,6 +56,9 @@ class MainViewModel @Inject constructor(
 
     val event : LiveData<Event<EventList>>
         get() = _event
+
+    val region: MutableState<String>
+        get() = _region
 
     val bottomSheetOpen: MutableState<Boolean>
         get() = _bottomSheetOpen
@@ -85,10 +89,29 @@ class MainViewModel @Inject constructor(
     }
     fun init(){
         getDate()
-        _weather.value.region = AccountAssistant.getData("region") ?: "없음"
-        weather.value = Weather("진주시", 30.5, 15.0, 24.3, 0, "맑음")
+        region.value = AccountAssistant.getData("region") ?: "없음"
+        weather.value = Weather(30.5, 15.0, 24.3, 0.0, "맑음",0.0)
+        getWeather()
     }
 
+    private fun getWeather(){
+        if (AccountAssistant.getData("lat") == null || AccountAssistant.getData("lon") == null) return
+        repository.getWeather(AccountAssistant.getData("lat")!!.toDouble(), AccountAssistant.getData("lon")!!.toDouble()).observeForever { resource ->
+            when (resource.status) {
+                Status.SUCCESS -> {
+                    _weather.value = resource.data!!
+                    Log.d("test","날씨 가져옴")
+                }
+                Status.ERROR -> {
+                    // 에러 처리, 예를 들어 사용자에게 메시지 표시
+                    Log.d("test", "Error 날씨 ${resource.message}")
+                }
+                Status.LOADING -> {
+                }
+            }
+
+        }
+    }
 
 
     private fun getDate(){
@@ -122,8 +145,10 @@ class MainViewModel @Inject constructor(
         geocoder.getFromLocation(latitude, longitude, 1) { addresses ->
             if (addresses.isNotEmpty()) {
                 val cityName = addresses[0].locality
-                _weather.value.region = cityName
+                region.value = cityName
                 AccountAssistant.setData("region", cityName)
+                AccountAssistant.setData("lat", latitude.toString())
+                AccountAssistant.setData("lon", longitude.toString())
             }
         }
 

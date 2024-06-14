@@ -7,6 +7,8 @@ import com.fashionPeople.fashionGuide.data.Clothing
 import com.fashionPeople.fashionGuide.data.Event
 import com.fashionPeople.fashionGuide.data.EventList
 import com.fashionPeople.fashionGuide.data.Resource
+import com.fashionPeople.fashionGuide.data.Weather
+import com.fashionPeople.fashionGuide.data.request.WeatherRequest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -118,6 +120,26 @@ open class ClothingRepository @Inject constructor(private val api: ClothingApi) 
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
                 result.postValue(Resource.error("통신 오류", null))
+            }
+        })
+        return result
+    }
+
+    open fun getWeather(lat: Double, lon: Double): LiveData<Resource<Weather>> {
+        val result = MutableLiveData<Resource<Weather>>()
+        api.getWeather(lat,lon).enqueue(object : Callback<Weather> {
+            override fun onResponse(call: Call<Weather>, response: Response<Weather>) {
+                if (response.isSuccessful) {
+                    result.value = Resource.success(response.body()!!)
+                } else {
+                    result.value = Resource.error("Failed to get weather", null)
+                    Log.d("test",response.toString())
+                }
+            }
+
+            override fun onFailure(call: Call<Weather>, t: Throwable) {
+                result.value = Resource.error("Network error", null)
+                Log.d("test",t.toString())
             }
         })
         return result

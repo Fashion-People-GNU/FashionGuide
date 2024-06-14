@@ -1,14 +1,18 @@
 package com.fashionPeople.fashionGuide
 
 import com.fashionPeople.fashionGuide.data.Clothing
+import com.fashionPeople.fashionGuide.data.Weather
+import com.fashionPeople.fashionGuide.data.request.WeatherRequest
 import okhttp3.MultipartBody
 import retrofit2.Call
+import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ClothingApi {
     @Multipart
@@ -22,6 +26,12 @@ interface ClothingApi {
     // 옷 불러오는 통신 api
     @GET("clothes/{uid}")
     fun getClothingList(@Path("uid") uid: String): Call<List<Clothing>>
+
+    @GET("weather")
+    fun getWeather(
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double
+    ): Call<Weather>
 
     @DELETE("closet/delete/{uid}/{cloth_id}")
     fun deleteClothing(

@@ -384,7 +384,7 @@ fun HomeScreen(viewModel: MainViewModel){
         }
 
         CustomTabs(viewModel)
-        WeatherBox(viewModel.weather.value,viewModel.todayDate.value)
+        WeatherBox(viewModel.weather.value,viewModel.region.value,viewModel.todayDate.value)
 
         if (viewModel.isTabScreen.value == 0) {
             EntireRecommendation()
@@ -450,7 +450,7 @@ fun ClosetScreen(viewModel: MainViewModel){
     val clothingList by viewModel.clothingLiveData.observeAsState()
     val weather by viewModel.weather
     val todayDate by viewModel.todayDate
-
+    val region by viewModel.region
 
     Box {
         Column(
@@ -470,7 +470,7 @@ fun ClosetScreen(viewModel: MainViewModel){
                     text = "옷장")
             }
 
-            WeatherBox(weather,todayDate)
+            WeatherBox(weather,region,todayDate)
             clothingList?.let { GridLayout(it) }
 
         }
@@ -484,7 +484,7 @@ fun ClosetScreen(viewModel: MainViewModel){
 }
 
 @Composable
-private fun WeatherBox(weather: Weather,todayDate: TodayDate) {
+private fun WeatherBox(weather: Weather,region: String,todayDate: TodayDate) {
     Text(
         modifier = Modifier.fillMaxWidth(),
         textAlign = TextAlign.Left,
@@ -500,7 +500,7 @@ private fun WeatherBox(weather: Weather,todayDate: TodayDate) {
             contentDescription = "place"
         )
         Text(
-            text = weather.region
+            text = region
         )
     }
     Column(
@@ -601,37 +601,6 @@ fun GridLayout(clothingList: List<Clothing>) {
 }
 
 @Composable
-fun TestGridItem(clothing: Clothing) {
-    val context = LocalContext.current
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                val intent = Intent(context, DetailedClothingActivity::class.java).apply {
-                    putExtra("clothing", clothing)
-                }
-                context.startActivity(intent)
-            }
-    ) {
-        Image(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            painter = painterResource(id = R.drawable.test_item),
-            contentDescription = "clothing_image"
-        )
-        Text(
-            text = clothing.imageName,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        )
-    }
-
-}
-
-@Composable
 fun SettingsScreen(viewModel: MainViewModel){
     val context = LocalContext.current
     Column(
@@ -712,7 +681,7 @@ fun SettingsScreen(viewModel: MainViewModel){
 
 @Composable
 fun RegionDialogScreen(viewModel: MainViewModel){
-    val region = viewModel.weather.value.region
+    val region = viewModel.region
     Dialog(onDismissRequest = { viewModel.setRegionDialogScreen(0) }) {
         Column(
             modifier = Modifier
