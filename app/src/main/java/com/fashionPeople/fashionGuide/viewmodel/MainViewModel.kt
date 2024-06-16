@@ -44,7 +44,7 @@ class MainViewModel @Inject constructor(
     private val _isRegionDialogScreen = mutableIntStateOf(0)
     private val _isResultDialogScreen = mutableIntStateOf(0)
     private val _todayDate = mutableStateOf(TodayDate(0,0,0,"없음"))
-    private val _weather = mutableStateOf(Weather( 0.0, 0.0, 0.0, 0.0, "없음",0.0))
+    private val _weather = mutableStateOf(Weather( 0.0, 0.0, 0.0, 0.0, "없음","없음",0.0))
     private val _region = mutableStateOf("없음")
 
     private val _isLoading = mutableStateOf(false)
@@ -90,7 +90,6 @@ class MainViewModel @Inject constructor(
     fun init(){
         getDate()
         region.value = AccountAssistant.getData("region") ?: "없음"
-        weather.value = Weather(30.5, 15.0, 24.3, 0.0, "맑음",0.0)
         getWeather()
     }
 
@@ -107,6 +106,7 @@ class MainViewModel @Inject constructor(
                     Log.d("test", "Error 날씨 ${resource.message}")
                 }
                 Status.LOADING -> {
+
                 }
             }
 
