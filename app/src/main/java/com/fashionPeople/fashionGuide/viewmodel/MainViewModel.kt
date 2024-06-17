@@ -43,6 +43,7 @@ class MainViewModel @Inject constructor(
     private val _isTabScreen = mutableIntStateOf(0)
     private val _isRegionDialogScreen = mutableIntStateOf(0)
     private val _isResultDialogScreen = mutableIntStateOf(0)
+    private val _isSourcesDialogScreen = mutableIntStateOf(0)
     private val _todayDate = mutableStateOf(TodayDate(0,0,0,"없음"))
     private val _weather = mutableStateOf(Weather( 0.0, 0.0, 0.0, 0.0, "없음","없음",0.0))
     private val _region = mutableStateOf("없음")
@@ -68,6 +69,9 @@ class MainViewModel @Inject constructor(
 
     val isRegionDialogScreen: MutableState<Int>
         get() = _isRegionDialogScreen
+
+    val isSourcesDialogScreen: MutableState<Int>
+        get() = _isSourcesDialogScreen
 
     val isResultDialogScreen: MutableState<Int>
         get() = _isResultDialogScreen
@@ -134,7 +138,6 @@ class MainViewModel @Inject constructor(
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             location?.let {
                 getCityName(it.latitude, it.longitude,activity)
-                setRegionDialogScreen(1)
             }
         }
     }
@@ -162,6 +165,9 @@ class MainViewModel @Inject constructor(
         _isResultDialogScreen.intValue = dialog
     }
 
+    fun setSourcesDialogScreen(dialog: Int){
+        _isSourcesDialogScreen.intValue = dialog
+    }
 
     fun getClothingList(){
         repository.getClothingList().observeForever { resource ->

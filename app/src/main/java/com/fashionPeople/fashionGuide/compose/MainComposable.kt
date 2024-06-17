@@ -76,7 +76,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role.Companion.Button
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -485,6 +484,14 @@ fun ClosetScreen(viewModel: MainViewModel){
 
 @Composable
 private fun WeatherBox(weather: Weather,region: String,todayDate: TodayDate) {
+    var weatherId = R.drawable.sun
+    when(weather.weather){
+        "맑음" -> weatherId = R.drawable.sun
+        "구름 많음" -> weatherId = R.drawable.cloud
+        "비" -> weatherId = R.drawable.rain
+        "눈" -> weatherId = R.drawable.snow
+        "안개" -> weatherId = R.drawable.fog
+    }
     Text(
         modifier = Modifier.fillMaxWidth(),
         textAlign = TextAlign.Left,
@@ -555,8 +562,9 @@ private fun WeatherBox(weather: Weather,region: String,todayDate: TodayDate) {
                 text = "°C",
             )
             Image(
-                modifier = Modifier.padding(4.dp),
-                painter = painterResource(id = R.drawable.sun),
+                modifier = Modifier.size(35.dp)
+                    .padding(4.dp),
+                painter = painterResource(id = weatherId),
                 contentDescription = "weather"
             )
         }
@@ -622,6 +630,9 @@ fun SettingsScreen(viewModel: MainViewModel){
         if (viewModel.isRegionDialogScreen.value == 1) {
             RegionDialogScreen(viewModel)
         }
+        if (viewModel.isSourcesDialogScreen.value == 1) {
+            SourcesDialogScreen(viewModel)
+        }
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
@@ -633,6 +644,7 @@ fun SettingsScreen(viewModel: MainViewModel){
                 .fillMaxWidth()
                 .clickable {
                     viewModel.getRegion(context as Activity)
+                    viewModel.setRegionDialogScreen(1)
                 },
         ) {
             Text(
@@ -666,6 +678,22 @@ fun SettingsScreen(viewModel: MainViewModel){
         Text(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(16.dp)
+                .clickable {
+                    viewModel.setSourcesDialogScreen(1)
+                },
+            style = Typography.bodyMedium,
+            text = "데이터 출처")
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .height(1.dp)
+                .background(WhiteGray)
+        )
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(16.dp),
             style = Typography.bodyMedium,
             text = "로그아웃")
@@ -681,7 +709,7 @@ fun SettingsScreen(viewModel: MainViewModel){
 
 @Composable
 fun RegionDialogScreen(viewModel: MainViewModel){
-    val region = viewModel.region
+    val region by viewModel.region
     Dialog(onDismissRequest = { viewModel.setRegionDialogScreen(0) }) {
         Column(
             modifier = Modifier
@@ -696,6 +724,25 @@ fun RegionDialogScreen(viewModel: MainViewModel){
             Spacer(modifier = Modifier.height(8.dp))
             Text("현재 사는 지역: $region", style = Typography.bodyMedium)
             Text("설정 완료", style = Typography.bodyMedium)
+        }
+    }
+}
+
+@Composable
+fun SourcesDialogScreen(viewModel: MainViewModel){
+    Dialog(onDismissRequest = { viewModel.setSourcesDialogScreen(0) }) {
+        Column(
+            modifier = Modifier
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+
+        ) {
+            Text("데이터 출처")
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("날씨 아이콘 - 기상청 공공누리", style = Typography.bodyMedium)
         }
     }
 }
