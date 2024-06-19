@@ -63,6 +63,7 @@ import com.fashionPeople.fashionGuide.activity.UserRegistrationActivity
 import com.fashionPeople.fashionGuide.data.Clothing
 import com.fashionPeople.fashionGuide.data.Screen
 import com.fashionPeople.fashionGuide.ui.theme.Cold100
+import com.fashionPeople.fashionGuide.ui.theme.Cold60
 import com.fashionPeople.fashionGuide.ui.theme.Typography
 import com.fashionPeople.fashionGuide.ui.theme.WhiteGray
 import com.fashionPeople.fashionGuide.viewmodel.MainViewModel
@@ -115,7 +116,7 @@ fun UserRegistrationScreen(viewModel: UserRegistrationViewModel) {
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(
                                     if (selectedAgeGroup == ageGroup)
-                                        Cold100
+                                        Cold60
                                     else MaterialTheme.colorScheme.surface
                                 )
                                 .clickable { selectedAgeGroup = ageGroup }
@@ -142,7 +143,7 @@ fun UserRegistrationScreen(viewModel: UserRegistrationViewModel) {
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(
                                     if (selectedGender == gender)
-                                        Cold100
+                                        Cold60
                                     else MaterialTheme.colorScheme.surface
                                 )
                                 .clickable { selectedGender = gender }
