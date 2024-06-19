@@ -1,5 +1,6 @@
 package com.fashionPeople.fashionGuide.activity
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -35,6 +36,22 @@ class RequestClothingActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun observeViewModel(){
+        viewModel.closeActivityEvent.observe(this) { event ->
+            event.getContentIfNotHandled()?.let {
+                finish() // 액티비티 종료
+                val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("clothingId", viewModel.currentClothingId.value)
+                startActivity(intent)
+            }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        observeViewModel()
     }
 
 

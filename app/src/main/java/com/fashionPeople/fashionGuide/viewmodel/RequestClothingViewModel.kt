@@ -4,11 +4,13 @@ package com.fashionPeople.fashionGuide.viewmodel
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.lifecycle.LiveData
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.fashionPeople.fashionGuide.ClothingRepository
 import com.fashionPeople.fashionGuide.data.Clothing
+import com.fashionPeople.fashionGuide.data.Event
 
 import com.fashionPeople.fashionGuide.data.Status
 
@@ -22,11 +24,19 @@ class RequestClothingViewModel @Inject constructor(
     private val _clothingLiveData = MutableLiveData<List<Clothing>?>()
     private val _isSubmitDialogScreen = mutableIntStateOf(0)
 
+    private val _closeActivityEvent = MutableLiveData<Event<Unit>>()
+    val closeActivityEvent: LiveData<Event<Unit>> = _closeActivityEvent
+
+    private val _currentClothingId =  MutableLiveData<String>()
+
     val clothingLiveData: MutableLiveData<List<Clothing>?>
         get() = _clothingLiveData
 
     val isSubmitDialogScreen: MutableState<Int>
         get() = _isSubmitDialogScreen
+
+    val currentClothingId: MutableLiveData<String>
+        get() = _currentClothingId
 
     init {
         getClothingList()
@@ -37,6 +47,13 @@ class RequestClothingViewModel @Inject constructor(
         _isSubmitDialogScreen.value = value
     }
 
+    fun closeActivity() {
+        _closeActivityEvent.value = Event(Unit)
+    }
+
+    fun setClothingId(clothingId: String){
+        _currentClothingId.value = clothingId
+    }
 
     private fun getClothingList(){
         repository.getClothingList().observeForever { resource ->

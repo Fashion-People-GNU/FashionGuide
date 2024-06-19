@@ -66,6 +66,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -80,7 +81,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
@@ -91,24 +91,25 @@ import coil.compose.rememberAsyncImagePainter
 import com.fashionPeople.fashionGuide.R
 import com.fashionPeople.fashionGuide.activity.AddClothingActivity
 import com.fashionPeople.fashionGuide.activity.DetailedClothingActivity
-import com.fashionPeople.fashionGuide.activity.RequestClothingActivity
+import com.fashionPeople.fashionGuide.activity.LoginActivity
 import com.fashionPeople.fashionGuide.data.Clothing
+import com.fashionPeople.fashionGuide.data.RecommendOption
 import com.fashionPeople.fashionGuide.data.Screen
 import com.fashionPeople.fashionGuide.data.TodayDate
 import com.fashionPeople.fashionGuide.data.Weather
 import com.fashionPeople.fashionGuide.ui.theme.Typography
 import com.fashionPeople.fashionGuide.ui.theme.WhiteGray
+import com.fashionPeople.fashionGuide.utils.LoginUtils
 import com.fashionPeople.fashionGuide.viewmodel.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(viewModel: MainViewModel) {
+fun MainScreen(viewModel: MainViewModel,activity: Activity) {
     val screenList = listOf(Screen.Home,Screen.Closet,Screen.Settings)
     val navController = rememberNavController()
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     val closetBottomSheet = rememberModalBottomSheetState()
     val isSheetOpen = viewModel.bottomSheetOpen
-    val context = LocalContext.current
     Scaffold(
         bottomBar = { BottomNavigationBar(navController,screenList) },
         floatingActionButton = {
@@ -125,10 +126,9 @@ fun MainScreen(viewModel: MainViewModel) {
                 FloatingActionButton(
                     onClick = {
                         if(viewModel.isTabScreen.value == 0){
-                            viewModel.setResultDialogScreen(1)
+                            viewModel.setInputStyleDialogScreen(1)
                         }else{
-                            startActivity(context, Intent(context, RequestClothingActivity::class.java), null)
-
+                            viewModel.selectClothingActivity()
                         }
 
                     }
@@ -140,28 +140,33 @@ fun MainScreen(viewModel: MainViewModel) {
         floatingActionButtonPosition = FabPosition.Center
 
     ) { innerPaddingModifier ->
+        Box{
+            NavHost(
+                navController,
+                startDestination = Screen.Home.route,
+                modifier = Modifier.padding(innerPaddingModifier)
+            ) {
+                composable(Screen.Home.route) {
 
-        NavHost(
-            navController,
-            startDestination = Screen.Home.route,
-            modifier = Modifier.padding(innerPaddingModifier)
-        ) {
-            composable(Screen.Home.route) {
+                    HomeScreen(viewModel)
 
-                HomeScreen(viewModel)
+                }
+                composable(Screen.Closet.route) {
+                    ClosetScreen(viewModel)
+                }
+                composable(Screen.Settings.route) {
 
+                    SettingsScreen(viewModel,activity)
+
+                }
             }
-            composable(Screen.Closet.route) {
-                ClosetScreen(viewModel)
+            if (isSheetOpen.value) {
+                ImagePickerBottomSheet(closetBottomSheet,isSheetOpen)
             }
-            composable(Screen.Settings.route) {
-
-                SettingsScreen(viewModel)
-
+            if(viewModel.isLoading.value){
+                Log.d("test", "loading")
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
-        }
-        if (isSheetOpen.value) {
-            ImagePickerBottomSheet(closetBottomSheet,isSheetOpen)
         }
 
     }
@@ -401,6 +406,9 @@ fun HomeScreen(viewModel: MainViewModel){
         if (viewModel.isResultDialogScreen.value == 1) {
             ResultDialogScreen(viewModel)
         }
+        if (viewModel.isInputStyleDialogScreen.value == 1) {
+            InputStyleDialogScreen(viewModel)
+        }
 
 
     }
@@ -554,7 +562,8 @@ private fun WeatherBox(weather: Weather,region: String,todayDate: TodayDate) {
                 .padding(4.dp)
         ) {
             Image(
-                modifier = Modifier.size(35.dp)
+                modifier = Modifier
+                    .size(35.dp)
                     .padding(4.dp),
                 painter = painterResource(id = R.drawable.high_temp),
                 contentDescription = "high_temp"
@@ -566,7 +575,8 @@ private fun WeatherBox(weather: Weather,region: String,todayDate: TodayDate) {
                 text = "/",
             )
             Image(
-                modifier = Modifier.size(35.dp)
+                modifier = Modifier
+                    .size(35.dp)
                     .padding(4.dp),
                 painter = painterResource(id = R.drawable.low_temp),
                 contentDescription = "low_temp"
@@ -578,7 +588,8 @@ private fun WeatherBox(weather: Weather,region: String,todayDate: TodayDate) {
                 text = "°C",
             )
             Image(
-                modifier = Modifier.size(35.dp)
+                modifier = Modifier
+                    .size(35.dp)
                     .padding(4.dp),
                 painter = painterResource(id = weatherId),
                 contentDescription = "weather"
@@ -621,11 +632,12 @@ fun GridLayout(clothingList: List<Clothing>,onClothingClick: (Clothing) -> Unit)
 }
 
 @Composable
-fun SettingsScreen(viewModel: MainViewModel){
+fun SettingsScreen(viewModel: MainViewModel, activity: Activity){
+    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(8.dp)
     ) {
         Box(
@@ -677,19 +689,6 @@ fun SettingsScreen(viewModel: MainViewModel){
         Text(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            style = Typography.bodyMedium,
-            text = "사용자 스타일 설정")
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .height(1.dp)
-                .background(WhiteGray)
-        )
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
                 .padding(16.dp)
                 .clickable {
                     viewModel.setSourcesDialogScreen(1)
@@ -706,7 +705,12 @@ fun SettingsScreen(viewModel: MainViewModel){
         Text(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(16.dp)
+                .clickable {
+                    LoginUtils(coroutineScope,activity,context).logout()
+                    activity.finish()
+                    activity.startActivity(Intent(context, LoginActivity::class.java))
+                },
             style = Typography.bodyMedium,
             text = "로그아웃")
         Spacer(
@@ -761,6 +765,8 @@ fun SourcesDialogScreen(viewModel: MainViewModel){
 
 @Composable
 fun ResultDialogScreen(viewModel: MainViewModel){
+    val recommendedClothingList = viewModel.recommendedClothingLiveData.value
+    var currentIndex by remember { mutableStateOf(0) }
     Dialog(onDismissRequest = { viewModel.setResultDialogScreen(0) }) {
         Surface(
             modifier = Modifier
@@ -776,68 +782,128 @@ fun ResultDialogScreen(viewModel: MainViewModel){
                     .background(MaterialTheme.colorScheme.surface),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("모델 결과(상의)",color=MaterialTheme.colorScheme.onBackground)
+                Text("모델 결과",color=MaterialTheme.colorScheme.onBackground)
                 Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        modifier = Modifier.size(48.dp),
-                        onClick = { /* Handle left arrow click */ }
+                if(recommendedClothingList?.size == 1){
+                    Text("* 결과가 하나만 존재합니다",color= Color.Red, style = Typography.bodyMedium)
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                if (!recommendedClothingList.isNullOrEmpty()){
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Previous",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .size(150.dp)
-                            .background(Color.Gray, shape = RoundedCornerShape(8.dp)),
-                        contentAlignment = Alignment.Center
-                    ){
-                        Image(
+                        IconButton(
+                            modifier = Modifier.size(48.dp),
+                            onClick = {
+                                if (currentIndex > 0) {
+                                    currentIndex-=1
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Previous",
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                        Box(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .clip(RoundedCornerShape(8.dp)),
-                            contentScale = ContentScale.Crop,
-                            painter = painterResource(id = R.drawable.test_top),
-                            contentDescription = "Centered Image"
-                        )
-                    }
+                                .padding(horizontal = 16.dp)
+                                .size(150.dp)
+                                .background(Color.Gray, shape = RoundedCornerShape(8.dp)),
+                            contentAlignment = Alignment.Center
+                        ){
+                            Image(
+                                modifier = Modifier
+                                    .size(150.dp)
+                                    .clip(RoundedCornerShape(8.dp)),
+                                contentScale = ContentScale.Crop,
+                                painter = rememberAsyncImagePainter(model = recommendedClothingList[currentIndex].imageUrl),
+                                contentDescription = "Centered Image"
+                            )
+                        }
 
-                    IconButton(
-                        modifier = Modifier.size(48.dp),
-                        onClick = { /* Handle right arrow click */ }
+                        IconButton(
+                            modifier = Modifier.size(48.dp),
+                            onClick = {
+                                if (currentIndex < recommendedClothingList.size - 1) {
+                                    currentIndex+=1
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowForward,
+                                contentDescription = "Next",
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(recommendedClothingList[currentIndex].type,color=MaterialTheme.colorScheme.onBackground)
+                    Button(
+                        onClick = { viewModel.setResultDialogScreen(0) },
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth()
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowForward,
-                            contentDescription = "Next",
-                            modifier = Modifier.size(32.dp)
-                        )
+                        Text("확인")
                     }
+                }else{
+                    Text("옷 추천 결과가 없습니다.", style = Typography.bodyMedium)
+                }
 
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("재킷",color=MaterialTheme.colorScheme.onBackground)
-                Button(
-                    onClick = { viewModel.setResultDialogScreen(0) },
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text("확인")
-                }
 
             }
         }
     }
 
 }
+
+@Composable
+fun InputStyleDialogScreen(viewModel: MainViewModel){
+    val option = if(viewModel.isTabScreen.value == 0) RecommendOption.Entire else RecommendOption.Partial
+    Dialog(onDismissRequest = { viewModel.setInputStyleDialogScreen(0) }) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text ="스타일을 선택하세요"
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = {
+                if (option == RecommendOption.Entire) {
+                    viewModel.entireClothingList("클래식")
+                }else{
+                    viewModel.partialClothingList("클래식",viewModel.currentClothing.value!!)
+                }
+                viewModel.setInputStyleDialogScreen(0)
+            }) {
+                Text("클래식")
+            }
+            Button(onClick = {
+                viewModel.entireClothingList("스트리트")
+                viewModel.setInputStyleDialogScreen(0)
+            }) {
+                Text("스트리트")
+            }
+            Button(onClick = {
+                viewModel.entireClothingList("러블리")
+                viewModel.setInputStyleDialogScreen(0)
+            }) {
+                Text("러블리")
+
+            }
+        }
+    }
+}
+
 
 
 

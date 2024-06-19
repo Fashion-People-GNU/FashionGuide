@@ -33,6 +33,10 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (intent.getStringExtra("clothingId") != null){
+            viewModel.setClothingId(intent.getStringExtra("clothingId")!!)
+            viewModel.setInputStyleDialogScreen(1)
+        }
         setContent {
             FashionGuideTheme {
                 // A surface container using the 'background' color from the theme
@@ -43,7 +47,7 @@ class MainActivity : ComponentActivity() {
                     getPermissions()
                     viewModel.getRegion(this)
                     viewModel.init()
-                    MainScreen(viewModel)
+                    MainScreen(viewModel,this)
 
                 }
             }
@@ -72,7 +76,12 @@ class MainActivity : ComponentActivity() {
                         Log.d("test", "observeViewModel")
                         viewModel.getClothingList()
                         Toast.makeText(this,"삭제 성공", Toast.LENGTH_SHORT).show()
-
+                    }
+                    EventList.CLOTHING_SELECT -> {
+                        Log.d("test", "observeViewModel")
+                        finish()
+                        val intent = Intent(this, RequestClothingActivity::class.java)
+                        startActivity(intent)
                     }
                     EventList.USER_LOAD -> {
                         checkUserInfo()

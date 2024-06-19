@@ -135,11 +135,12 @@ class LoginUtils(coroutineScope: CoroutineScope, activity: Activity, localContex
         if (preferences.getBoolean(AccountAssistant.KEY_IS_LOGIN, false)) {
             val i = Intent(context, MainActivity::class.java)
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            context.startActivity(i)
+            activity.finish()
+            activity.startActivity(i)
         }
     }
 
-    private fun logout() {
+    fun logout() {
         AccountAssistant.clearPreferences()
         val preferences = activity.getSharedPreferences(AccountAssistant.PREFS_NAME, Context.MODE_PRIVATE)
         preferences.edit().apply {

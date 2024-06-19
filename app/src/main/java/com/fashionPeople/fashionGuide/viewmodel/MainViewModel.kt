@@ -26,6 +26,7 @@ import com.fashionPeople.fashionGuide.data.Status
 import com.fashionPeople.fashionGuide.data.TodayDate
 import com.fashionPeople.fashionGuide.data.UserInfo
 import com.fashionPeople.fashionGuide.data.Weather
+import com.fashionPeople.fashionGuide.data.response.RecommendedClothing
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -40,12 +41,15 @@ class MainViewModel @Inject constructor(
     private val _event = repository.event
 
     private val _clothingLiveData = MutableLiveData<List<Clothing>?>()
+    private val _recommendedClothingLiveData = MutableLiveData<List<RecommendedClothing>?>()
+    private val _currentClothingId =  MutableLiveData<String>()
     private val _userInfo = MutableLiveData<UserInfo?>()
     private val _bottomSheetOpen = mutableStateOf(false)
     private val _isTabScreen = mutableIntStateOf(0)
     private val _isRegionDialogScreen = mutableIntStateOf(0)
     private val _isResultDialogScreen = mutableIntStateOf(0)
     private val _isSourcesDialogScreen = mutableIntStateOf(0)
+    private val _isInputStyleDialogScreen = mutableIntStateOf(0)
     private val _todayDate = mutableStateOf(TodayDate(0,0,0,"없음"))
     private val _weather = mutableStateOf(Weather( 0.0, 0.0, 0.0, 0.0, "없음","없음",0.0))
     private val _region = mutableStateOf("없음")
@@ -56,6 +60,12 @@ class MainViewModel @Inject constructor(
         get() = _isLoading
     val clothingLiveData: MutableLiveData<List<Clothing>?>
         get() = _clothingLiveData
+
+    val recommendedClothingLiveData: MutableLiveData<List<RecommendedClothing>?>
+        get() = _recommendedClothingLiveData
+
+    val currentClothing: MutableLiveData<String>
+        get() = _currentClothingId
 
     val event : LiveData<Event<EventList>>
         get() = _event
@@ -68,6 +78,9 @@ class MainViewModel @Inject constructor(
 
     val isTabScreen: MutableState<Int>
         get() = _isTabScreen
+
+    val isInputStyleDialogScreen: MutableState<Int>
+        get() = _isInputStyleDialogScreen
 
     val isRegionDialogScreen: MutableState<Int>
         get() = _isRegionDialogScreen
@@ -90,6 +103,14 @@ class MainViewModel @Inject constructor(
 
     fun setTabScreen(tab: Int){
         _isTabScreen.intValue = tab
+    }
+
+    fun selectClothingActivity(){
+        _event.value = Event(EventList.CLOTHING_SELECT)
+    }
+
+    fun setClothingId(id: String){
+        _currentClothingId.value = id
     }
 
     init {
@@ -175,6 +196,10 @@ class MainViewModel @Inject constructor(
         _isSourcesDialogScreen.intValue = dialog
     }
 
+    fun setInputStyleDialogScreen(dialog: Int){
+        _isInputStyleDialogScreen.intValue = dialog
+    }
+
     fun getClothingList(){
         viewModelScope.launch {
             repository.getClothingList().observeForever { resource ->
@@ -193,6 +218,59 @@ class MainViewModel @Inject constructor(
                     }
                     Status.LOADING -> {
                         isLoading.value = true
+                    }
+                }
+
+            }
+        }
+    }
+
+    fun entireClothingList(style: String){
+        viewModelScope.launch {
+            repository.entireClothingList(AccountAssistant.getUID()!!,style,AccountAssistant.getData("lat")!!.toDouble(),AccountAssistant.getData("lon")!!.toDouble()).observeForever { resource ->
+                when (resource.status) {
+                    Status.SUCCESS -> {
+                        _isLoading.value = false
+                        _recommendedClothingLiveData.postValue(resource.data)
+                        isResultDialogScreen.value = 1
+                        Log.d("test","추천 데이터 가져옴")
+                    }
+                    Status.ERROR -> {
+                        // 에러 처리, 예를 들어 사용자에게 메시지 표시
+                        _isLoading.value = false
+                        _clothingLiveData.postValue(listOf())
+                        Log.d("test", "Error adding clothing: ${resource.message}")
+
+                    }
+                    Status.LOADING -> {
+                        _isLoading.value = true
+                    }
+                }
+
+            }
+        }
+    }
+
+    fun partialClothingList(style: String,clothingId: String){
+        viewModelScope.launch {
+            repository.partialClothingList(
+                AccountAssistant.getUID()!!,
+                style,
+                AccountAssistant.getData("lat")!!.toDouble(),
+                AccountAssistant.getData("lon")!!.toDouble(),
+                clothingId).observeForever { resource ->
+                when (resource.status) {
+                    Status.SUCCESS -> {
+                        _recommendedClothingLiveData.postValue(listOf(resource.data!!))
+                        Log.d("test","데이터 가져옴")
+                    }
+                    Status.ERROR -> {
+                        // 에러 처리, 예를 들어 사용자에게 메시지 표시
+                        _clothingLiveData.postValue(listOf())
+                        Log.d("test", "Error adding clothing: ${resource.message}")
+
+                    }
+                    Status.LOADING -> {
                     }
                 }
 

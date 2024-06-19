@@ -3,6 +3,7 @@ package com.fashionPeople.fashionGuide
 import com.fashionPeople.fashionGuide.data.Clothing
 import com.fashionPeople.fashionGuide.data.UserInfo
 import com.fashionPeople.fashionGuide.data.Weather
+import com.fashionPeople.fashionGuide.data.response.RecommendedClothing
 import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.http.DELETE
@@ -65,7 +66,21 @@ interface ClothingApi {
     ): Call<Void>
 
     @GET("clothes_propose")
-    fun recommendClothing(
-        @Query("age") uid: String
-    ): Call<List<Clothing>>
+    fun entireRecommendClothing(
+        @Query("uid") uid: String,
+        @Query("style") style: String,
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
+        @Query("recommendFlag") flag: Int,
+    ): Call<List<RecommendedClothing>>
+
+    @GET("clothes_propose")
+    fun partialRecommendClothing(
+        @Query("uid") uid: String,
+        @Query("style") style: String,
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
+        @Query("clothId") clothId: String,
+        @Query("recommendFlag") flag: Int,
+    ): Call<RecommendedClothing>
 }

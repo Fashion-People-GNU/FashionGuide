@@ -100,6 +100,7 @@ fun RequestClothingScreen(viewModel: RequestClothingViewModel) {
         ) {
 
             clothingList?.let { GridLayout(it){clothing ->
+                viewModel.setClothingId(clothing.id)
                 viewModel.setSubmitDialogScreen(1)
             } }
 
@@ -133,7 +134,10 @@ fun SubmitClothingDialog(viewModel: RequestClothingViewModel){
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f).padding(8.dp),
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        viewModel.setSubmitDialogScreen(0)
+                        viewModel.closeActivity()
+                    },
                 ) {
                     Text("예")
                 }
@@ -142,7 +146,7 @@ fun SubmitClothingDialog(viewModel: RequestClothingViewModel){
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f).padding(8.dp),
-                    onClick = { /*TODO*/ },
+                    onClick = { viewModel.setSubmitDialogScreen(0) },
                 ) {
                     Text("아니요")
                 }
