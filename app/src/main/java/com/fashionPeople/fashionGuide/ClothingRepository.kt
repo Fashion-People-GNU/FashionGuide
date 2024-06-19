@@ -7,12 +7,9 @@ import com.fashionPeople.fashionGuide.data.Clothing
 import com.fashionPeople.fashionGuide.data.Event
 import com.fashionPeople.fashionGuide.data.EventList
 import com.fashionPeople.fashionGuide.data.Resource
+import com.fashionPeople.fashionGuide.data.UserInfo
 import com.fashionPeople.fashionGuide.data.Weather
-import com.fashionPeople.fashionGuide.data.request.WeatherRequest
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -138,6 +135,47 @@ open class ClothingRepository @Inject constructor(private val api: ClothingApi) 
             }
 
             override fun onFailure(call: Call<Weather>, t: Throwable) {
+                result.value = Resource.error("Network error", null)
+                Log.d("test",t.toString())
+            }
+        })
+        return result
+    }
+
+    open fun getUserInfo(uid: String): LiveData<Resource<UserInfo>> {
+        val result = MutableLiveData<Resource<UserInfo>>()
+        api.getUserInfo(uid).enqueue(object : Callback<UserInfo> {
+            override fun onResponse(call: Call<UserInfo>, response: Response<UserInfo>) {
+                if (response.isSuccessful) {
+                    result.value = Resource.success(response.body()!!)
+                } else {
+                    result.value = Resource.error("Failed to get user info", null)
+                    Log.d("test",response.toString())
+                }
+            }
+
+            override fun onFailure(call: Call<UserInfo>, t: Throwable) {
+                result.value = Resource.error("Network error", null)
+                Log.d("test",t.toString())
+            }
+        })
+        return result
+    }
+
+    open fun updateUserInfo(uid: String, age: String, sex: String): LiveData<Resource<Any?>> {
+        val result = MutableLiveData<Resource<Any?>>()
+
+        api.updateUserInfo(uid,age,sex).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    result.value = Resource.success(null)
+                } else {
+                    result.value = Resource.error("Failed to update user info", null)
+                    Log.d("test",response.toString())
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
                 result.value = Resource.error("Network error", null)
                 Log.d("test",t.toString())
             }

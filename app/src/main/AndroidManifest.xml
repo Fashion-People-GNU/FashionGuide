@@ -32,6 +32,12 @@
             android:exported="true"
             android:theme="@style/Theme.FashionGuide">
         </activity>
+        <activity android:name=".activity.RequestClothingActivity"
+            android:theme="@style/Theme.FashionGuide"
+            android:exported="true"/>
+        <activity android:name=".activity.UserRegistrationActivity"
+            android:theme="@style/Theme.FashionGuide"
+            android:exported="true"/>
         <activity
             android:name=".activity.LoginActivity"
             android:exported="true"

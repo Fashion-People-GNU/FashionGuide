@@ -1,12 +1,13 @@
 package com.fashionPeople.fashionGuide
 
 import com.fashionPeople.fashionGuide.data.Clothing
+import com.fashionPeople.fashionGuide.data.UserInfo
 import com.fashionPeople.fashionGuide.data.Weather
-import com.fashionPeople.fashionGuide.data.request.WeatherRequest
 import okhttp3.MultipartBody
 import retrofit2.Call
-import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -49,4 +50,22 @@ interface ClothingApi {
         @Part("imageName") imageName: String,
         @Part image: MultipartBody.Part
     ): Call<Void>
+
+    @GET("user/info/get")
+    fun getUserInfo(
+        @Query("uid") uid: String
+    ): Call<UserInfo>
+
+    @FormUrlEncoded
+    @POST("user/info/update")
+    fun updateUserInfo(
+        @Field("uid") uid: String,
+        @Field("age") age: String,
+        @Field("sex") sex: String
+    ): Call<Void>
+
+    @GET("clothes_propose")
+    fun recommendClothing(
+        @Query("age") uid: String
+    ): Call<List<Clothing>>
 }

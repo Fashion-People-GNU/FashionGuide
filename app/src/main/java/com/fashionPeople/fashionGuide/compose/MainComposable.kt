@@ -80,6 +80,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
@@ -90,6 +91,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.fashionPeople.fashionGuide.R
 import com.fashionPeople.fashionGuide.activity.AddClothingActivity
 import com.fashionPeople.fashionGuide.activity.DetailedClothingActivity
+import com.fashionPeople.fashionGuide.activity.RequestClothingActivity
 import com.fashionPeople.fashionGuide.data.Clothing
 import com.fashionPeople.fashionGuide.data.Screen
 import com.fashionPeople.fashionGuide.data.TodayDate
@@ -106,7 +108,7 @@ fun MainScreen(viewModel: MainViewModel) {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     val closetBottomSheet = rememberModalBottomSheetState()
     val isSheetOpen = viewModel.bottomSheetOpen
-
+    val context = LocalContext.current
     Scaffold(
         bottomBar = { BottomNavigationBar(navController,screenList) },
         floatingActionButton = {
@@ -122,7 +124,13 @@ fun MainScreen(viewModel: MainViewModel) {
             if (currentRoute == Screen.Home.route) {
                 FloatingActionButton(
                     onClick = {
-                        viewModel.setResultDialogScreen(1)
+                        if(viewModel.isTabScreen.value == 0){
+                            viewModel.setResultDialogScreen(1)
+                        }else{
+                            startActivity(context, Intent(context, RequestClothingActivity::class.java), null)
+
+                        }
+
                     }
                 ) {
                     Icon(Icons.Filled.Search, contentDescription = "Search")
@@ -446,6 +454,7 @@ fun PartialRecommendation(){
 
 @Composable
 fun ClosetScreen(viewModel: MainViewModel){
+    val context = LocalContext.current
     val clothingList by viewModel.clothingLiveData.observeAsState()
     val weather by viewModel.weather
     val todayDate by viewModel.todayDate
@@ -470,7 +479,14 @@ fun ClosetScreen(viewModel: MainViewModel){
             }
 
             WeatherBox(weather,region,todayDate)
-            clothingList?.let { GridLayout(it) }
+            clothingList?.let { GridLayout(it){
+                clothing ->
+                val intent =
+                    Intent(context, DetailedClothingActivity::class.java).apply {
+                        putExtra("clothing", clothing)
+                    }
+                context.startActivity(intent)
+            } }
 
         }
         if (viewModel.isLoading.value) {
@@ -572,7 +588,7 @@ private fun WeatherBox(weather: Weather,region: String,todayDate: TodayDate) {
 }
 
 @Composable
-fun GridLayout(clothingList: List<Clothing>) {
+fun GridLayout(clothingList: List<Clothing>,onClothingClick: (Clothing) -> Unit) {
     //옷장페이지에서 옷을 불러오는 코드
     val context = LocalContext.current
     LazyVerticalGrid(
@@ -588,11 +604,7 @@ fun GridLayout(clothingList: List<Clothing>) {
                         .height(100.dp)
                         .width(100.dp)
                         .clickable {
-                            val intent =
-                                Intent(context, DetailedClothingActivity::class.java).apply {
-                                    putExtra("clothing", clothingList[index])
-                                }
-                            context.startActivity(intent)
+                            onClothingClick(clothing)
                         }
                 ) {
                     Image(

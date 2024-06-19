@@ -2,6 +2,7 @@ package com.fashionPeople.fashionGuide.activity
 
 import android.Manifest
 import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -17,6 +18,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import com.fashionPeople.fashionGuide.compose.MainScreen
+import com.fashionPeople.fashionGuide.data.Event
 import com.fashionPeople.fashionGuide.data.EventList
 import com.fashionPeople.fashionGuide.ui.theme.FashionGuideTheme
 import com.fashionPeople.fashionGuide.viewmodel.MainViewModel
@@ -72,8 +74,17 @@ class MainActivity : ComponentActivity() {
                         Toast.makeText(this,"삭제 성공", Toast.LENGTH_SHORT).show()
 
                     }
+                    EventList.USER_LOAD -> {
+                        checkUserInfo()
+                    }
                 }
             }
+        }
+    }
+    private fun checkUserInfo(){
+        val userInfo = viewModel.userInfo.value
+        if (userInfo?.age == "" || userInfo?.sex == ""){
+            startActivity(Intent(this, UserRegistrationActivity::class.java))
         }
     }
 

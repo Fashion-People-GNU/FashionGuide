@@ -24,6 +24,7 @@ import com.fashionPeople.fashionGuide.data.Event
 import com.fashionPeople.fashionGuide.data.EventList
 import com.fashionPeople.fashionGuide.data.Status
 import com.fashionPeople.fashionGuide.data.TodayDate
+import com.fashionPeople.fashionGuide.data.UserInfo
 import com.fashionPeople.fashionGuide.data.Weather
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,6 +40,7 @@ class MainViewModel @Inject constructor(
     private val _event = repository.event
 
     private val _clothingLiveData = MutableLiveData<List<Clothing>?>()
+    private val _userInfo = MutableLiveData<UserInfo?>()
     private val _bottomSheetOpen = mutableStateOf(false)
     private val _isTabScreen = mutableIntStateOf(0)
     private val _isRegionDialogScreen = mutableIntStateOf(0)
@@ -82,14 +84,18 @@ class MainViewModel @Inject constructor(
     val todayDate: MutableState<TodayDate>
         get() = _todayDate
 
+    val userInfo: MutableLiveData<UserInfo?>
+        get() = _userInfo
+
 
     fun setTabScreen(tab: Int){
         _isTabScreen.intValue = tab
     }
 
     init {
+        getUserInfo()
         getClothingList()
-        Log.d("test",repository.hashCode().toString())
+        Log.d("test","main:" +repository.hashCode().toString())
     }
     fun init(){
         getDate()
@@ -170,27 +176,55 @@ class MainViewModel @Inject constructor(
     }
 
     fun getClothingList(){
-        repository.getClothingList().observeForever { resource ->
-            when (resource.status) {
-                Status.SUCCESS -> {
-                    _clothingLiveData.postValue(resource.data)
-                    isLoading.value = false
-                    Log.d("test","데이터 가져옴")
-                }
-                Status.ERROR -> {
-                    isLoading.value = false
-                    // 에러 처리, 예를 들어 사용자에게 메시지 표시
-                    _clothingLiveData.postValue(listOf())
-                    Log.d("test", "Error adding clothing: ${resource.message}")
+        viewModelScope.launch {
+            repository.getClothingList().observeForever { resource ->
+                when (resource.status) {
+                    Status.SUCCESS -> {
+                        _clothingLiveData.postValue(resource.data)
+                        isLoading.value = false
+                        Log.d("test","데이터 가져옴")
+                    }
+                    Status.ERROR -> {
+                        isLoading.value = false
+                        // 에러 처리, 예를 들어 사용자에게 메시지 표시
+                        _clothingLiveData.postValue(listOf())
+                        Log.d("test", "Error adding clothing: ${resource.message}")
 
+                    }
+                    Status.LOADING -> {
+                        isLoading.value = true
+                    }
                 }
-                Status.LOADING -> {
-                    isLoading.value = true
-                }
+
             }
-
         }
     }
+
+    private fun getUserInfo() {
+        viewModelScope.launch {
+            repository.getUserInfo(AccountAssistant.getUID()!!).observeForever { resource ->
+                when (resource.status) {
+                    Status.SUCCESS -> {
+                        _userInfo.postValue(resource.data)
+                        _event.postValue(Event(EventList.USER_LOAD))
+                        Log.d("test", "user 가져옴")
+                    }
+
+                    Status.ERROR -> {
+                        // 에러 처리, 예를 들어 사용자에게 메시지 표시
+                        _userInfo.postValue(UserInfo("", "", "", ""))
+                        Log.d("test", "Error data: ${resource.message}")
+
+                    }
+
+                    Status.LOADING -> {
+                    }
+                }
+
+            }
+        }
+    }
+
     fun setBottomSheet(isBottomSheet: Boolean){
         _bottomSheetOpen.value = isBottomSheet
     }
@@ -203,8 +237,6 @@ class MainViewModel @Inject constructor(
                 }
             }
         }
-
-
 
     }
 
