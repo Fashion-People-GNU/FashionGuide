@@ -103,28 +103,6 @@ open class ClothingRepository @Inject constructor(private val api: ClothingApi) 
         return result
     }
 
-
-    //옷장 업데이트 api 호출
-    open fun updateClothing(id: String, imageName: String, image: MultipartBody.Part): LiveData<Resource<Any?>> {
-        val result = MutableLiveData<Resource<Any?>>()
-        result.postValue(Resource.loading(null))  // 초기 로딩 상태 설정
-        api.updateClothing(AccountAssistant.getUID()!!,id, imageName, image).enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if (response.isSuccessful) {
-                    result.postValue(Resource.success(null))
-                } else {
-                    result.postValue(Resource.error("Failed to update clothing", null))  // 실패 상태 포스트
-
-                }
-            }
-
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                result.postValue(Resource.error("통신 오류", null))
-            }
-        })
-        return result
-    }
-
     open fun getWeather(lat: Double, lon: Double): LiveData<Resource<Weather>> {
         val result = MutableLiveData<Resource<Weather>>()
         result.postValue(Resource.loading(null))  // 초기 로딩 상태 설정

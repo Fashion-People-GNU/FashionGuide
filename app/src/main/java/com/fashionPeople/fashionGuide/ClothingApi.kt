@@ -18,7 +18,7 @@ import retrofit2.http.Query
 
 interface ClothingApi {
     @Multipart
-    @POST("upload")
+    @POST("clothes/add")
     fun addClothing(
         @Part("uid") uid: String,
         @Part("imageName") imageName: String,
@@ -26,31 +26,20 @@ interface ClothingApi {
     ): Call<Void>
 
     // 옷 불러오는 통신 api
-    @GET("clothes/{uid}")
+    @GET("clothes/get/{uid}")
     fun getClothingList(@Path("uid") uid: String): Call<List<Clothing>>
 
-    @GET("weather")
+    @GET("weather/get")
     fun getWeather(
         @Query("lat") lat: Double,
         @Query("lon") lon: Double
     ): Call<Weather>
 
-    @DELETE("closet/delete/{uid}/{cloth_id}")
+    @DELETE("clothes/delete/{uid}/{cloth_id}")
     fun deleteClothing(
         @Path("uid") uid: String,
         @Path("cloth_id") id: String
     ): Call<Unit>
-
-
-    //옷을 업데이트 하는 api
-    @Multipart
-    @DELETE("closet/{id}")
-    fun updateClothing(
-        @Path("id") id: String,
-        @Part("uid") uid: String,
-        @Part("imageName") imageName: String,
-        @Part image: MultipartBody.Part
-    ): Call<Void>
 
     @GET("user/info/get")
     fun getUserInfo(
@@ -65,7 +54,7 @@ interface ClothingApi {
         @Field("sex") sex: String
     ): Call<Void>
 
-    @GET("clothes_propose")
+    @GET("clothes/propose")
     fun entireRecommendClothing(
         @Query("uid") uid: String,
         @Query("style") style: String,
@@ -74,7 +63,7 @@ interface ClothingApi {
         @Query("recommendFlag") flag: Int,
     ): Call<List<RecommendedClothing>>
 
-    @GET("clothes_propose")
+    @GET("clothes/propose")
     fun partialRecommendClothing(
         @Query("uid") uid: String,
         @Query("style") style: String,
