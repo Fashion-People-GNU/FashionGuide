@@ -18,7 +18,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import com.fashionPeople.fashionGuide.compose.MainScreen
-import com.fashionPeople.fashionGuide.data.Event
+import com.fashionPeople.fashionGuide.data.Clothing
 import com.fashionPeople.fashionGuide.data.EventList
 import com.fashionPeople.fashionGuide.ui.theme.FashionGuideTheme
 import com.fashionPeople.fashionGuide.viewmodel.MainViewModel
@@ -33,8 +33,9 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (intent.getStringExtra("clothingId") != null){
-            viewModel.setClothingId(intent.getStringExtra("clothingId")!!)
+        if (intent?.extras?.getParcelable<Clothing>("clothing") != null){
+            viewModel.setClothing(intent?.extras?.getParcelable("clothing")!!)
+            viewModel.setTabScreen(1)
             viewModel.setInputStyleDialogScreen(1)
         }
         setContent {

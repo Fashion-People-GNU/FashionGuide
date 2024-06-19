@@ -100,7 +100,7 @@ fun RequestClothingScreen(viewModel: RequestClothingViewModel) {
         ) {
 
             clothingList?.let { GridLayout(it){clothing ->
-                viewModel.setClothingId(clothing.id)
+                viewModel.setClothingId(clothing)
                 viewModel.setSubmitDialogScreen(1)
             } }
 

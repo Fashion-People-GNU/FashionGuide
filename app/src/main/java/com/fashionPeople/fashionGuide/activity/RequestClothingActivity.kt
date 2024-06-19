@@ -43,7 +43,7 @@ class RequestClothingActivity : ComponentActivity() {
             event.getContentIfNotHandled()?.let {
                 finish() // 액티비티 종료
                 val intent = Intent(this, MainActivity::class.java)
-                intent.putExtra("clothingId", viewModel.currentClothingId.value)
+                intent.putExtra("clothing", viewModel.currentClothing.value)
                 startActivity(intent)
             }
         }

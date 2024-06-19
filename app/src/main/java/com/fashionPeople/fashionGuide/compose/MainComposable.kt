@@ -337,7 +337,7 @@ fun BottomNavigationBar(navController: NavController, items: List<Screen>) {
 
 @Composable
 fun CustomTabs(viewModel: MainViewModel) {
-    var selectedIndex by remember { mutableIntStateOf(0) }
+    var selectedIndex = viewModel.isTabScreen.value
 
     val list = listOf("전체 추천", "부분 추천")
 
@@ -401,7 +401,7 @@ fun HomeScreen(viewModel: MainViewModel){
         if (viewModel.isTabScreen.value == 0) {
             EntireRecommendation()
         } else {
-            PartialRecommendation()
+            PartialRecommendation(viewModel.currentClothing.value)
         }
         if (viewModel.isResultDialogScreen.value == 1) {
             ResultDialogScreen(viewModel)
@@ -420,7 +420,7 @@ fun EntireRecommendation(){
         modifier = Modifier.fillMaxWidth(),
         fontSize = 16.sp,
         textAlign = TextAlign.Center,
-        text = "상하의를 동시에 추천하는 방식")
+        text = "상 하의를 동시에 추천하는 방식")
     //동그란 이미지로 나오게 하기
 
     Image(
@@ -439,25 +439,36 @@ fun EntireRecommendation(){
 }
 
 @Composable
-fun PartialRecommendation(){
-    Text(
-        modifier = Modifier.fillMaxWidth(),
-        fontSize = 16.sp,
-        textAlign = TextAlign.Center,
-        text = "상 하의중 하나를 추천하는 방식")
-    Image(
+fun PartialRecommendation(currentClothing: Clothing?){
+    Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1f)
-            .padding(16.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .shadow(
-                elevation = 4.dp, // 그림자의 높이를 조정할 수 있습니다.
-                clip = true
-            ),
-        alignment = Alignment.Center,
-        painter = painterResource(id = R.drawable.test_item),
-        contentDescription = "content")
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center,
+            text = "상 하의중 하나를 추천하는 방식")
+        Spacer(modifier = Modifier.height(16.dp))
+        Image(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .padding(16.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .shadow(
+                    elevation = 4.dp, // 그림자의 높이를 조정할 수 있습니다.
+                    clip = true
+                ),
+            contentScale = ContentScale.Crop,
+            alignment = Alignment.Center,
+            painter = if (currentClothing!=null) rememberAsyncImagePainter(model = currentClothing.imageUrl)
+            else painterResource(id = R.drawable.test_item),
+            contentDescription = "content")
+    }
+
 }
 
 @Composable
@@ -707,7 +718,7 @@ fun SettingsScreen(viewModel: MainViewModel, activity: Activity){
                 .fillMaxWidth()
                 .padding(16.dp)
                 .clickable {
-                    LoginUtils(coroutineScope,activity,context).logout()
+                    LoginUtils(coroutineScope, activity, context).logout()
                     activity.finish()
                     activity.startActivity(Intent(context, LoginActivity::class.java))
                 },
@@ -784,11 +795,11 @@ fun ResultDialogScreen(viewModel: MainViewModel){
             ) {
                 Text("모델 결과",color=MaterialTheme.colorScheme.onBackground)
                 Spacer(modifier = Modifier.height(8.dp))
-                if(recommendedClothingList?.size == 1){
+                if(recommendedClothingList?.size == 1 && !recommendedClothingList[0].id.isNullOrEmpty()){
                     Text("* 결과가 하나만 존재합니다",color= Color.Red, style = Typography.bodyMedium)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                if (!recommendedClothingList.isNullOrEmpty()){
+                if (!recommendedClothingList.isNullOrEmpty() && !recommendedClothingList[0].id.isNullOrEmpty()){
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center,
@@ -881,20 +892,28 @@ fun InputStyleDialogScreen(viewModel: MainViewModel){
                 if (option == RecommendOption.Entire) {
                     viewModel.entireClothingList("클래식")
                 }else{
-                    viewModel.partialClothingList("클래식",viewModel.currentClothing.value!!)
+                    viewModel.partialClothingList("클래식",viewModel.currentClothing.value!!.id)
                 }
                 viewModel.setInputStyleDialogScreen(0)
             }) {
                 Text("클래식")
             }
             Button(onClick = {
-                viewModel.entireClothingList("스트리트")
+                if (option == RecommendOption.Entire) {
+                    viewModel.entireClothingList("스트리트")
+                }else{
+                    viewModel.partialClothingList("스트리트",viewModel.currentClothing.value!!.id)
+                }
                 viewModel.setInputStyleDialogScreen(0)
             }) {
                 Text("스트리트")
             }
             Button(onClick = {
-                viewModel.entireClothingList("러블리")
+                if (option == RecommendOption.Entire) {
+                    viewModel.entireClothingList("러블리")
+                }else{
+                    viewModel.partialClothingList("러블리",viewModel.currentClothing.value!!.id)
+                }
                 viewModel.setInputStyleDialogScreen(0)
             }) {
                 Text("러블리")

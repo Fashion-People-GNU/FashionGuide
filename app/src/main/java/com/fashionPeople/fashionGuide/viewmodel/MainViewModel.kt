@@ -42,7 +42,7 @@ class MainViewModel @Inject constructor(
 
     private val _clothingLiveData = MutableLiveData<List<Clothing>?>()
     private val _recommendedClothingLiveData = MutableLiveData<List<RecommendedClothing>?>()
-    private val _currentClothingId =  MutableLiveData<String>()
+    private val _currentClothing =  MutableLiveData<Clothing>()
     private val _userInfo = MutableLiveData<UserInfo?>()
     private val _bottomSheetOpen = mutableStateOf(false)
     private val _isTabScreen = mutableIntStateOf(0)
@@ -64,8 +64,8 @@ class MainViewModel @Inject constructor(
     val recommendedClothingLiveData: MutableLiveData<List<RecommendedClothing>?>
         get() = _recommendedClothingLiveData
 
-    val currentClothing: MutableLiveData<String>
-        get() = _currentClothingId
+    val currentClothing: MutableLiveData<Clothing>
+        get() = _currentClothing
 
     val event : LiveData<Event<EventList>>
         get() = _event
@@ -109,8 +109,8 @@ class MainViewModel @Inject constructor(
         _event.value = Event(EventList.CLOTHING_SELECT)
     }
 
-    fun setClothingId(id: String){
-        _currentClothingId.value = id
+    fun setClothing(clothing: Clothing){
+        _currentClothing.value = clothing
     }
 
     init {
@@ -261,16 +261,20 @@ class MainViewModel @Inject constructor(
                 clothingId).observeForever { resource ->
                 when (resource.status) {
                     Status.SUCCESS -> {
+                        _isLoading.value = false
                         _recommendedClothingLiveData.postValue(listOf(resource.data!!))
-                        Log.d("test","데이터 가져옴")
+                        isResultDialogScreen.value = 1
+                        Log.d("test","부분 데이터 가져옴")
                     }
                     Status.ERROR -> {
+                        _isLoading.value = false
                         // 에러 처리, 예를 들어 사용자에게 메시지 표시
-                        _clothingLiveData.postValue(listOf())
+                        _recommendedClothingLiveData.postValue(listOf())
                         Log.d("test", "Error adding clothing: ${resource.message}")
 
                     }
                     Status.LOADING -> {
+                        _isLoading.value = true
                     }
                 }
 

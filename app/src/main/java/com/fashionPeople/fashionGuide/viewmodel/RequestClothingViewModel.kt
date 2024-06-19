@@ -27,7 +27,7 @@ class RequestClothingViewModel @Inject constructor(
     private val _closeActivityEvent = MutableLiveData<Event<Unit>>()
     val closeActivityEvent: LiveData<Event<Unit>> = _closeActivityEvent
 
-    private val _currentClothingId =  MutableLiveData<String>()
+    private val _currentClothing =  MutableLiveData<Clothing>()
 
     val clothingLiveData: MutableLiveData<List<Clothing>?>
         get() = _clothingLiveData
@@ -35,8 +35,8 @@ class RequestClothingViewModel @Inject constructor(
     val isSubmitDialogScreen: MutableState<Int>
         get() = _isSubmitDialogScreen
 
-    val currentClothingId: MutableLiveData<String>
-        get() = _currentClothingId
+    val currentClothing: MutableLiveData<Clothing>
+        get() = _currentClothing
 
     init {
         getClothingList()
@@ -51,8 +51,8 @@ class RequestClothingViewModel @Inject constructor(
         _closeActivityEvent.value = Event(Unit)
     }
 
-    fun setClothingId(clothingId: String){
-        _currentClothingId.value = clothingId
+    fun setClothingId(clothing: Clothing){
+        _currentClothing.value = clothing
     }
 
     private fun getClothingList(){
