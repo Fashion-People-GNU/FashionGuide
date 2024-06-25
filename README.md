@@ -2,7 +2,6 @@
 
 🏛 USG 공유대학 스마트제조ICT학과 패션피플팀
 💻 캡스톤 종합설계경진대회 출품작  
-</br>
 
 ## 프로젝트 소개  
 
@@ -10,15 +9,14 @@
 • 개인 의류 데이터를 기반으로 날씨별 패션 코디를 추천해주는 어플리케이션
 • 사용자가 옷장을 관리하고, 개인 맞춤형 코디를 제공함으로써 패스트 패션 문제를 해결하고 지속 가능한 패션 문화를 조성하는 것을 목표
 ```
-
-</br>
   
 ## 프로젝트 구조
-
-![전체 구조](https://github.com/Fashion-People-GNU/FashionGuide/assets/98737142/13f39c1c-3c60-4196-89ef-f9e3fbf51916)
-
-
-![프로젝트 시스템 구조도](https://github.com/Fashion-People-GNU/FashionGuide/assets/98737142/52e942e9-6416-4fd7-95b9-8e17a7ffdd78)
+</br>
+<div align="center">
+  <img src="https://github.com/Fashion-People-GNU/FashionGuide/assets/98737142/13f39c1c-3c60-4196-89ef-f9e3fbf51916" alt="Image 1" width="400"/>
+  <img src="https://github.com/Fashion-People-GNU/FashionGuide/assets/98737142/52e942e9-6416-4fd7-95b9-8e17a7ffdd78" alt="Image 2" width="400"/>
+</div>
+</br>
 
 ```bash
 데이터 수집: 무신사 웹사이트에서 의류 데이터 크롤링.
@@ -28,15 +26,14 @@
 앱 개발: Kotlin과 Android SDK를 사용하여 사용자 친화적인 애플리케이션 개발.
 ```
 
-</br>
-
 ## 주요 기능  
 </br>
 <div align="center">
-  <img src="https://github.com/Fashion-People-GNU/FashionGuide/assets/98737142/8ae61251-97aa-4db9-929d-e81dac54f6a6" alt="Image 1" width="400"/>
-  <img src="https://github.com/Fashion-People-GNU/FashionGuide/assets/98737142/07f76e2c-9a20-4797-a301-cf3851176c9d" alt="Image 2" width="400"/>
+  <img src="https://github.com/Fashion-People-GNU/FashionGuide/assets/98737142/8ae61251-97aa-4db9-929d-e81dac54f6a6" alt="Image 1" width="200"/>
+  <img src="https://github.com/Fashion-People-GNU/FashionGuide/assets/98737142/07f76e2c-9a20-4797-a301-cf3851176c9d" alt="Image 2" width="200"/>
 </div>
 </br>
+
 **1. 날씨 기반 옷 추천 기능**
 
   ```bash
@@ -49,10 +46,11 @@
 
 </br>
 <div align="center">
-  <img src="https://github.com/Fashion-People-GNU/FashionGuide/assets/98737142/beb8134d-0dfa-4a5b-a37e-7b031072cdbc" alt="Image 1" width="400"/>
-  <img src="https://github.com/Fashion-People-GNU/FashionGuide/assets/98737142/8117709b-d6e7-4d2c-9b18-eefa8bc9c64a" alt="Image 2" width="400"/>
+  <img src="https://github.com/Fashion-People-GNU/FashionGuide/assets/98737142/beb8134d-0dfa-4a5b-a37e-7b031072cdbc" alt="Image 1" width="200"/>
+  <img src="https://github.com/Fashion-People-GNU/FashionGuide/assets/98737142/8117709b-d6e7-4d2c-9b18-eefa8bc9c64a" alt="Image 2" width="200"/>
 </div>
 </br>
+
 **2. 가상 옷장 관리 기능**  
 
   ```bash
@@ -62,8 +60,7 @@
 • 옷장에 저장된 옷을 바탕으로 추천받은 코디를 확인할 수 있습니다.
 • 사용자가 옷장을 효율적으로 정리하고 관리할 수 있도록 도와줍니다.
   ```
-    
-</br>
+  
 
 ## 사용 방법
 
@@ -85,4 +82,3 @@ Restrofit 2.9.0, Google Play Services Location 21.2.0, Firebase 23.0.0, Firestor
 모델: YOLOv5, K-Prototypes
 ```
 
-</br>
